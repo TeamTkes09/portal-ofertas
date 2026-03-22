@@ -4,59 +4,78 @@ import urllib.parse
 def render_news_section(suffix):
     st.markdown("### 📡 TechFlash Live: Oportunidades en Tiempo Real")
     
-    # Base de datos con Enlaces de Compra Relacionados
+    # CSS para el efecto de parpadeo (Blink)
+    st.markdown("""
+        <style>
+        @keyframes blinker {  
+            50% { opacity: 0.4; }
+        }
+        .urgent-blink {
+            animation: blinker 1.5s linear infinite;
+            background: #ef4444 !important;
+            color: white !important;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 800;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    # Datos con Consultas de Compra Estratégicas
     news_data = [
         {
-            "tag": "💾 HW", 
-            "title": "Escasez de chips H100", 
-            "desc": "El mercado de reventa sube un 12%. Revisa existencias de GPUs profesionales.", 
-            "time": "5m", "type": "warning",
-            "link_query": "NVIDIA RTX 6000 Ada" # Producto profesional alternativo
+            "tag": "⚠️ URGENTE", 
+            "title": "Escasez Chips H100", 
+            "desc": "Stock global bajo mínimos. Las alternativas workstation están subiendo.", 
+            "time": "2m", "type": "warning",
+            "link_query": "NVIDIA RTX 6000 Ada",
+            "blink": True
         },
         {
             "tag": "🔥 IA", 
-            "title": "Nuevas Mac con M4", 
-            "desc": "Apple prioriza chips para IA. Los modelos M3 podrían entrar en liquidación.", 
-            "time": "12m", "type": "info",
-            "link_query": "MacBook Pro M3 Max"
+            "title": "Lanzamiento M4 Ultra", 
+            "desc": "Apple renueva stock. Los modelos M2/M3 entran en fase de liquidación.", 
+            "time": "15m", "type": "info",
+            "link_query": "MacBook Pro M3 Max",
+            "blink": False
         },
         {
-            "tag": "🎮 GAME", 
-            "title": "PS5 Pro Reacondicionadas", 
-            "desc": "Stock detectado en almacenes oficiales. Alta demanda esperada.", 
-            "time": "28m", "type": "success",
-            "link_query": "PS5 Pro Console"
+            "tag": "💎 OPORTUNIDAD", 
+            "title": "PS5 Pro Refurbished", 
+            "desc": "Amazon Warehouse detecta 15 unidades. Margen de reventa: 35%.", 
+            "time": "32m", "type": "success",
+            "link_query": "PS5 Pro Console refurbished",
+            "blink": False
         },
         {
-            "tag": "🎧 AUDIO", 
-            "title": "Lanzamiento Sony XM6", 
-            "desc": "Filtración inminente. El stock de XM5 está bajando de precio para limpiar inventario.", 
-            "time": "45m", "type": "warning",
-            "link_query": "Sony WH-1000XM5"
+            "tag": "⚡ MERCADO", 
+            "title": "Sony XM5 vs XM6", 
+            "desc": "Bajada de precio agresiva en XM5 por cambio de generación inminente.", 
+            "time": "50m", "type": "warning",
+            "link_query": "Sony WH-1000XM5",
+            "blink": True
         }
     ]
 
     cols = st.columns(4)
     for i, item in enumerate(news_data):
         with cols[i]:
-            # Generar link de Amazon basado en la noticia
             query = urllib.parse.quote(item["link_query"])
             amz_url = f"https://www.amazon{suffix}/s?k={query}&tag=unlimited0f3-20"
             
+            # Colores dinámicos
             color_map = {"info": "#0ea5e9", "success": "#22c55e", "warning": "#f59e0b"}
-            
+            tag_class = "urgent-blink" if item["blink"] else ""
+            tag_style = f"font-size: 8px; font-weight: 800; color: white; background: {color_map[item['type']]}; padding: 2px 5px; border-radius: 3px;" if not item["blink"] else ""
+
             st.markdown(f"""
-                <div style="background: #1e293b; padding: 12px; border-left: 4px solid {color_map[item['type']]}; border-radius: 5px; margin-bottom: 10px; min-height: 160px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="background: #1e293b; padding: 12px; border-bottom: 3px solid {color_map[item['type']]}; border-radius: 8px; margin-bottom: 10px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #334155;">
                     <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                            <span style="font-size: 8px; font-weight: 800; color: {color_map[item['type']]}; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 3px;">{item['tag']}</span>
-                            <span style="font-size: 8px; color: #64748b;">{item['time']}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span class="{tag_class}" style="{tag_style}">{item['tag']}</span>
+                            <span style="font-size: 8px; color: #64748b; font-weight: bold;">{item['time']}</span>
                         </div>
                         <p style="margin: 0; font-size: 11px; font-weight: 700; color: #f8fafc; line-height: 1.2;">{item['title']}</p>
-                        <p style="margin: 5px 0 0 0; font-size: 10px; color: #94a3b8; line-height: 1.3;">{item['desc']}</p>
+                        <p style="margin: 6px 0 0 0; font-size: 10px; color: #94a3b8; line-height: 1.4; height: 40px; overflow: hidden;">{item['desc']}</p>
                     </div>
-                    <a href="{amz_url}" target="_blank" style="display: block; background: {color_map[item['type']]}; color: white; text-align: center; padding: 4px; border-radius: 3px; font-size: 9px; font-weight: bold; text-decoration: none; margin-top: 10px;">
-                        🛒 VER OFERTA RELACIONADA
-                    </a>
-                </div>
-            """, unsafe_allow_html=True)
+                    <a href="{amz_url}" target="_blank" style="display: block; background: #fbbf24; color: #000; text-align: center; padding: 6px; border-radius: 4px; font-size:

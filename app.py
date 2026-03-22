@@ -7,79 +7,71 @@ import random
 import requests
 import time
 
-# 1. CONFIGURACIÓN DE PÁGINA SEGURA
-st.set_page_config(
-    page_title="TechFlash Safe & Pay 🔐",
-    page_icon="💳",
-    layout="wide"
-)
+# --- CONFIGURACIÓN DE SEGURIDAD Y UI ---
+st.set_page_config(page_title="TechFlash Pay 🔐 TechFlash780", page_icon="💳", layout="wide")
 
-# --- CSS: INTERFAZ BANCARIA Y SELLOS DE SEGURIDAD ---
+# --- CONFIGURACIÓN DE SOCIO PAYPAL ---
+MI_PAYPAL_USER = "TechFlash780"  
+# -------------------------------------------
+
 st.html('''
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        .stApp { background: #0d1117; color: #c9d1d9; font-family: 'Inter', sans-serif; }
         
-        .stApp { background: #0b0e14; color: #ffffff; }
-        
-        /* Banner de Seguridad Superior */
-        .safe-header {
-            background: #1a5cff;
-            color: white;
-            padding: 5px 20px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            border-radius: 0 0 10px 10px;
-        }
-
-        /* Tarjetas de Noticia */
-        .trend-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-            transition: 0.3s;
-        }
-        .trend-card:hover { border-color: #1a5cff; box-shadow: 0 0 15px rgba(26,92,255,0.3); }
-
-        /* Sección de Donación Premium */
-        .donate-box {
-            background: linear-gradient(135deg, #1e2631 0%, #0b0e14 100%);
-            border: 2px solid #1a5cff;
+        /* Contenedor de Donación */
+        .pay-header {
+            background: linear-gradient(135deg, #003087 0%, #0070ba 100%);
             padding: 30px;
             border-radius: 20px;
             text-align: center;
-            margin: 40px 0;
+            margin-bottom: 30px;
+            border: 1px solid #58a6ff;
+            box-shadow: 0 10px 30px rgba(0,112,186,0.2);
         }
 
-        .trust-icons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            filter: grayscale(100%) brightness(200%);
-            opacity: 0.6;
-            margin-top: 20px;
+        /* Tarjetas de Tendencias Premium */
+        .secure-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            transition: 0.3s ease;
+        }
+        .secure-card:hover { border-color: #0070ba; transform: translateY(-3px); }
+
+        /* Barra de Progreso de Meta */
+        .goal-bar {
+            background: #30363d;
+            border-radius: 10px;
+            height: 12px;
+            width: 100%;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .goal-fill {
+            background: #25D366;
+            height: 100%;
+            width: 65%; /* Simulación de meta al 65% */
         }
     </style>
 ''')
 
-# 2. SISTEMA DE ACCESO Y VERIFICACIÓN SSL
-if 'verified' not in st.session_state:
-    st.session_state.verified = False
+# 1. ACCESO SEGURO
+if 'auth' not in st.session_state:
+    st.session_state.auth = False
 
-if not st.session_state.verified:
-    st.markdown('<div class="safe-header">🔒 CONEXIÓN CIFRADA AES-256 ACTIVA</div>', unsafe_allow_html=True)
-    st.title("🔐 Validación de Nodo Seguro")
-    st.info("Estás entrando a una zona de transacciones protegida. Verificando certificados...")
-    if st.button("CONFIRMAR IDENTIDAD Y ENTRAR"):
-        st.session_state.verified = True
+if not st.session_state.auth:
+    st.title("🛡️ TechFlash Security")
+    st.info("Verificando credenciales de cifrado para TechFlash780...")
+    if st.button("🔓 ENTRAR AL PORTAL SEGURO"):
+        st.session_state.auth = True
         st.rerun()
     st.stop()
 
-# 3. DETECCIÓN DE PAÍS
-PAISES_CONFIG = {
+# 2. DETECCIÓN DE UBICACIÓN
+PAISES = {
     "AR": {"name": "Argentina 🇦🇷", "pn": "argentina", "lang": "es", "amz": ".com.be"},
     "ES": {"name": "España 🇪🇸", "pn": "spain", "lang": "es", "amz": ".es"},
     "MX": {"name": "México 🇲🇽", "pn": "mexico", "lang": "es", "amz": ".com.mx"},
@@ -88,62 +80,51 @@ PAISES_CONFIG = {
 }
 
 @st.cache_data(ttl=3600)
-def get_geo():
+def auto_geo():
     try:
         r = requests.get('https://ipapi.co/json/', timeout=3).json()
-        return PAISES_CONFIG.get(r.get('country_code'), PAISES_CONFIG["DEFAULT"])
-    except: return PAISES_CONFIG["DEFAULT"]
+        return PAISES.get(r.get('country_code'), PAISES["DEFAULT"])
+    except: return PAISES["DEFAULT"]
 
 if 'config' not in st.session_state:
-    st.session_state.config = get_geo()
+    st.session_state.config = auto_geo()
 
-# 4. SIDEBAR CON ESTADISTICAS DE SEGURIDAD
-with st.sidebar:
-    st.header("🛡️ Security Center")
-    st.success("SSL Status: Active")
-    st.code("IP: " + requests.get('https://api.ipify.org').text)
-    st.divider()
-    sel = st.selectbox("Región:", [v["name"] for v in PAISES_CONFIG.values()])
-    st.session_state.config = next(v for v in PAISES_CONFIG.values() if v["name"] == sel)
-
-# 5. RENDERIZADO PRINCIPAL
-st.markdown('<div class="safe-header">✓ NAVEGACIÓN SEGURA HABILITADA PARA COMPRAS</div>', unsafe_allow_html=True)
-st.title("⚡ TechFlash Secure Portal")
-
-# --- SECCIÓN DE DONACIONES / COMPRA SEGURA ---
-with st.container():
-    st.markdown('''
-        <div class="donate-box">
-            <h2 style="color:#1a5cff;">☕ Apoya el Proyecto</h2>
-            <p>Si te gusta nuestra tecnología de detección de ofertas, puedes colaborar para mantener los servidores activos.</p>
-            <div class="trust-icons">
-                <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" width="40">
-                <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" width="40">
-                <img src="https://cdn-icons-png.flaticon.com/512/5968/5968144.png" width="40">
+# 3. PANEL DE DONACIONES (CENTRALIZADO)
+st.markdown(f'''
+    <div class="pay-header">
+        <h1 style="color:white; margin:0; font-weight:900;">💳 Apoya a TechFlash780</h1>
+        <p style="color:#e6f0ff; margin:10px 0;">Ayúdanos a mantener los servidores de IA activos y libres de anuncios intrusivos.</p>
+        <div style="max-width:400px; margin: 0 auto;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:white;">
+                <span>Meta mensual: $100 USD</span>
+                <span>65% completado</span>
             </div>
+            <div class="goal-bar"><div class="goal-fill"></div></div>
         </div>
-    ''', unsafe_allow_html=True)
-    
-    col_pay1, col_pay2 = st.columns(2)
-    # Aquí podrías poner tus links reales de PayPal o Mercado Pago
-    col_pay1.link_button("💳 Donar con PayPal", "https://paypal.me/TU_USUARIO", use_container_width=True)
-    col_pay2.link_button("💰 Donar con Cripto/Otros", "#", use_container_width=True)
+    </div>
+''', unsafe_allow_html=True)
+
+c1, c2, c3 = st.columns([1,2,1])
+with c2:
+    paypal_url = f"https://www.paypal.me/{MI_PAYPAL_USER}"
+    st.link_button("🔥 DONAR POR PAYPAL (SEGURO)", paypal_url, use_container_width=True)
+    st.caption("✅ Verificado por PayPal. Transacción encriptada punto a punto.")
 
 st.divider()
 
-# 6. MOTOR DE CONTENIDO (Mantenemos lo anterior pero con diseño seguro)
+# 4. MOTOR DE CONTENIDO (OFERTAS ACTUALES)
 @st.cache_data(ttl=900)
 def get_safe_content(conf):
     try:
         pytrends = TrendReq(hl=conf['lang'], tz=360)
         trends = pytrends.trending_searches(pn=conf['pn'])[0].tolist()[:6]
-    except: trends = ["Tecnología", "Gadgets", "Ofertas"]
+    except: trends = ["Hardware", "Gadgets", "Cybersecurity", "Amazon Deals"]
     
     data = []
     translator = GoogleTranslator(source='auto', target=conf['lang'])
     for t in trends:
         kw = urllib.parse.quote(t)
-        rss = f"https://news.google.com/rss/search?q={kw}+tech&hl={conf['lang']}"
+        rss = f"https://news.google.com/rss/search?q={kw}+deals&hl={conf['lang']}"
         feed = feedparser.parse(rss)
         if feed.entries:
             try:
@@ -153,21 +134,24 @@ def get_safe_content(conf):
             except: continue
     return data
 
+st.subheader(f"🌐 Radar de Tendencias: {st.session_state.config['name']}")
 items = get_safe_content(st.session_state.config)
 
 for i, item in enumerate(items):
     st.markdown(f'''
-        <div class="trend-card">
-            <small style="color:#1a5cff;">🔒 ENLACE VERIFICADO | {item['trend']}</small>
-            <h3 style="margin-top:10px;">{item['title']}</h3>
+        <div class="secure-card">
+            <small style="color:#58a6ff;">🔍 DETECTADO EN {st.session_state.config['name'].upper()}</small>
+            <h3 style="margin-top:10px; color:white;">{item['title']}</h3>
+            <p style="font-size:12px; color:#8b949e;">Palabra clave: {item['trend']}</p>
         </div>
     ''', unsafe_allow_html=True)
     
-    c1, c2, c3 = st.columns([2,2,1])
-    c1.link_button("📰 Leer Noticia", item['url'], use_container_width=True)
-    c2.link_button("🛒 Oferta Segura Amazon", item['amz'], use_container_width=True)
-    # Botón de compartir en WhatsApp como herramienta de confianza
-    share_url = urllib.parse.quote(f"Mira esta oferta segura: {item['amz']}")
-    c3.link_button("📢", f"https://wa.me/?text={share_url}", use_container_width=True)
+    col1, col2, col3 = st.columns([2, 2, 1])
+    col1.link_button("📰 Leer Detalles", item['url'], use_container_width=True)
+    col2.link_button("🛒 Oferta Amazon", item['amz'], use_container_width=True)
+    
+    share_text = urllib.parse.quote(f"¡Mira esta oferta en TechFlash! {item['amz']}")
+    col3.link_button("📢", f"https://wa.me/?text={share_text}", use_container_width=True)
+    st.write("---")
 
-st.caption("Certificado SSL vigente. Transacciones gestionadas por plataformas externas seguras.")
+st.caption(f"Portal de Transacciones TechFlash v15.0 | Socio: {MI_PAYPAL_USER}")

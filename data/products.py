@@ -42,16 +42,36 @@ def get_news_events():
         }
     ]
 
+# Agrega o reemplaza esta función en data/products.py
 @st.cache_data(ttl=300)
 def get_crypto_opportunities():
-    btc = 64000 + random.randint(-100, 100)
+    # Simulamos datos de API con spreads reales de mercado
     return [
-        {"coin": "BTC", "gap": 550, "roi": 0.85, "exchanges": [
-            {"name": "Binance", "price": btc, "type": "COMPRA"},
-            {"name": "Kraken", "price": btc + 550, "type": "VENTA"}
-        ]},
-        {"coin": "ETH", "gap": 45, "roi": 1.4, "exchanges": [
-            {"name": "Coinbase", "price": 3400, "type": "COMPRA"},
-            {"name": "Binance", "price": 3445, "type": "VENTA"}
-        ]}
+        {
+            "coin": "BTC",
+            "red": "Bitcoin Network",
+            "fee_red": 0.0002, # ~12 USD
+            "exchanges": [
+                {"name": "Binance", "price": 64100, "type": "COMPRA"},
+                {"name": "Kraken", "price": 64650, "type": "VENTA"}
+            ]
+        },
+        {
+            "coin": "ETH",
+            "red": "Ethereum (ERC20)",
+            "fee_red": 0.0015, # ~5 USD
+            "exchanges": [
+                {"name": "Coinbase", "price": 3410, "type": "COMPRA"},
+                {"name": "Binance", "price": 3465, "type": "VENTA"}
+            ]
+        },
+        {
+            "coin": "SOL",
+            "red": "Solana",
+            "fee_red": 0.01, # ~1.5 USD
+            "exchanges": [
+                {"name": "Kraken", "price": 142.50, "type": "COMPRA"},
+                {"name": "Binance", "price": 146.20, "type": "VENTA"}
+            ]
+        }
     ]

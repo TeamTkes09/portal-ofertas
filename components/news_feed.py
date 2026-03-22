@@ -42,3 +42,4 @@ def fetch_data(query):
         return resultados
     except:
         return []
+ target_col.markdown(html_card, unsafe_allow_html=True)

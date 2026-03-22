@@ -1,27 +1,61 @@
 import streamlit as st
-from styles.html_templates import get_card_template
-
-def render_investment_section(suffix, lista_productos):
-    if not lista_productos:
-        st.write("No hay productos.")
-        return
-    cols = st.columns(4, gap="small")
-    for i, op in enumerate(lista_productos):
-        with cols[i % 4]:
-            costo, venta = op['c'], op['v']
-            roi = int(((venta - costo) / costo) * 100) if costo > 0 else 0
-            amz_url = f"https://www.amazon{suffix}/dp/{op['q']}"
-            comp = {item['sitio']: item['precio'] for item in op['comparativa']}
-            puntos = [("Amazon", costo), ("eBay", comp.get('ebay', 0)), ("Google", comp.get('google', 0)), ("Venta", venta)]
-            filas_html = ""
-            for sitio, precio in puntos:
-                filas_html += f'<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1e293b; padding: 1px 0;"><span style="color: #64748b; font-size: 9px;">{sitio}</span><span style="color: #60a5fa; font-size: 9px; font-weight: bold;">${precio}</span></div>'
-            html = get_card_template(op, roi, round(venta-costo, 2), amz_url, filas_html)
-            st.components.v1.html(html, height=225)
 
 def render_crypto_section(lista_crypto):
+    st.info("💡 **Estrategia:** Compra en el exchange verde, transfiere por la red indicada y vende en el rojo.")
+    
+    # Input de capital para cálculo dinámico
+    capital = st.number_input("Capital a invertir (USD)", min_value=100, value=1000, step=100)
+    
     cols = st.columns(3)
     for i, c in enumerate(lista_crypto):
         with cols[i % 3]:
-            ex_html = "".join([f'<div style="display:flex; justify-content:space-between; font-size: 12px; margin: 4px 0; color: white;"><span>{ex["name"]}</span><b style="color:{"#22c55e" if ex["type"]=="COMPRA" else "#ef4444" if ex["type"]=="VENTA" else "white"}">${ex["price"]}</b></div>' for ex in c['exchanges']])
-            st.markdown(f"""<div style="background: #1e293b; border-radius: 10px; padding: 15px; border: 1px solid #334155; color: white;"><h3 style="color: gold; margin: 0;">{c['coin']}</h3><p style="font-size: 20px; font-weight: bold; color: #22c55e; margin: 10px 0;">Gap: ${c['gap']}</p><hr style="border-color: #334155;">{ex_html}</div>""", unsafe_allow_html=True)
+            # Lógica de cálculo
+            buy_p = next(ex['price'] for ex in c['exchanges'] if ex['type'] == "COMPRA")
+            sell_p = next(ex['price'] for ex in c['exchanges'] if ex['type'] == "VENTA")
+            
+            # Cálculo de cantidad y ganancia
+            cantidad = capital / buy_p
+            ganancia_bruta = (cantidad * sell_p) - capital
+            costo_transferencia = c['fee_red'] * sell_p
+            ganancia_neta = ganancia_bruta - costo_transferencia
+            roi_neto = (ganancia_neta / capital) * 100
+
+            st.markdown(f"""
+            <div style="background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; color: white;">
+                <div style="display: flex; justify-content: space-between;">
+                    <h2 style="margin:0; color: #facc15;">{c['coin']}</h2>
+                    <span style="font-size: 0.8rem; color: #94a3b8;">Red: {c['red']}</span>
+                </div>
+                <hr style="opacity: 0.2; margin: 15px 0;">
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>🛒 Compra (Min):</span>
+                    <b style="color: #22c55e;">${buy_p:,}</b>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span>💰 Venta (Max):</span>
+                    <b style="color: #60a5fa;">${sell_p:,}</b>
+                </div>
+
+                <div style="background: #0f172a; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                        <span>Ganancia Bruta:</span>
+                        <span>+${ganancia_bruta:.2f}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #ef4444;">
+                        <span>Fee de Red:</span>
+                        <span>-${costo_transferencia:.2f}</span>
+                    </div>
+                    <hr style="opacity: 0.1; margin: 8px 0;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; color: #22c55e;">
+                        <span>NETO:</span>
+                        <span>${ganancia_neta:.2f}</span>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <small style="color: #94a3b8;">ROI NETO FINAL</small>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #facc15;">{roi_neto:.2f}%</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)

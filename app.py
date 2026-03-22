@@ -1,45 +1,47 @@
 import streamlit as st
 from utils import geo_logic
-from components import header, news_feed, business_cards, footer
+from data import products  # Importamos la base de datos central
+from components import header, news_feed, business_cards, business_table, footer
 
-# 1. Configuración de página (Debe ser la primera instrucción)
+# 1. Configuración de página
 st.set_page_config(
-    page_title="TechFlash Pro | Arbitraje de Hardware y IA en Tiempo Real",
+    page_title="TechFlash Pro | Arbitraje de Hardware y IA 2026",
     page_icon="⚡",
-    layout="wide",
-    menu_items={
-        'Get Help': 'https://tu-dominio.com',
-        'About': "# TechFlash Pro: La terminal líder en oportunidades de arbitraje 2026."
-    }
+    layout="wide"
 )
 
-# 2. Cargar contexto de mercado (País y Amazon)
+# 2. Cargar contexto y datos
 market = geo_logic.get_market_context()
+suffix = market['s']
+oportunidades = products.get_all_products()
 
-# 3. Renderizar Cabecera y Aviso Legal Superior
+# 3. Renderizar Cabecera
 header.render_hero(market['n'])
 
 # 4. Sistema de Navegación por Pestañas
 tab_biz, tab_news = st.tabs(["💰 OPORTUNIDADES DE NEGOCIO", "🌐 ACTUALIDAD TECNOLÓGICA"])
 
 with tab_biz:
-    # Renderiza las tarjetas de inversión con el sufijo de Amazon detectado
-    business_cards.render_investment_section(market['s'])
+    # --- SELECTOR DE VISTA ---
+    col_v, col_spacer = st.columns([1, 2])
+    with col_v:
+        vista = st.radio(
+            "Visualización:", 
+            ["🎴 Tarjetas", "📑 Tabla Excel"], 
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+    st.divider()
+
+    if vista == "🎴 Tarjetas":
+        # Usamos la lógica de tarjetas (ya filtrada internamente por tu business_cards)
+        business_cards.render_investment_section(suffix)
+    else:
+        # Usamos la nueva vista de tabla interactiva
+        business_table.render_data_table(oportunidades, suffix)
 
 with tab_news:
-    # Renderiza el motor de noticias en tiempo real
-    news_feed.render_news_section(suffix=".com")
+    news_feed.render_news_section(suffix=suffix)
 
-# 5. Renderizar Footer y Blindaje Legal Final
+# 5. Footer
 footer.render_legal_bunker("TechFlash780")
-# En app.py
-from components import business_cards, business_table
-
-# Selector de modo de visualización
-vista = st.radio("Seleccionar visualización:", ["🎴 Tarjetas Visuales", "📑 Tabla de Datos (Excel)"], horizontal=True)
-
-if vista == "🎴 Tarjetas Visuales":
-    business_cards.render_investment_section(suffix)
-else:
-    # Pasamos la lista de oportunidades a la tabla
-    business_table.render_data_table(oportunidades, suffix)

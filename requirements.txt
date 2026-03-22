@@ -1,4 +1,4 @@
 streamlit
+requests
 feedparser
-deep-translator
-pytrends
+deep_translator

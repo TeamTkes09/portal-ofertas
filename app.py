@@ -28,9 +28,18 @@ with tab2:
         st.warning("⚠️ Configura tus llaves API en la pestaña de Configuración.")
     else:
         if st.button("🔍 Iniciar Escaneo de Grafo"):
-            res = buscar_n_puntas(st.session_state['key'], st.session_state['secret'])
-            st.json(res)
-
+    res = buscar_n_puntas(st.session_state['key'], st.session_state['secret'])
+    
+    if res['status'] == 'success':
+        st.success(f"🔥 ¡Oportunidad Detectada! ROI: {res['roi']}%")
+        st.info(f"Ruta de {res['nodos']} saltos: {' ➡️ '.join(res['ruta'])}")
+        
+        # Guardar en sesión para ejecutar si el usuario quiere
+        st.session_state['ruta_activa'] = res['ruta']
+    elif res['status'] == 'no_path':
+        st.warning(f"Mercado estable: {res['message']}")
+    else:
+        st.error(f"Error técnico: {res['message']}")
 with tab3:
     st.subheader("Configuración de Seguridad")
     # Usamos on_change para asegurar que se guarde el estado inmediatamente

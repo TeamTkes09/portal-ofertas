@@ -3,6 +3,7 @@ import feedparser
 from deep_translator import GoogleTranslator
 from pytrends.request import TrendReq
 import pandas as pd
+import urllib.parse
 
 # 1. CONFIGURACIÓN ESTRATÉGICA (SEO Y DISEÑO)
 st.set_page_config(
@@ -12,8 +13,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- VERIFICACIÓN DE PROPIEDAD DE GOOGLE (No borrar) ---
-st.html('<meta name="google-site-verification" content="CkizRa_NBKko8N9KiS28aUkjKGkJbHlS3YI9htgLRRM" />')
+# --- VERIFICACIÓN DE PROPIEDAD DE GOOGLE (Inyectada en el Head) ---
+st.markdown(f'''
+    <script>
+        var meta = document.createElement('meta');
+        meta.name = "google-site-verification";
+        meta.content = "CkizRa_NBKko8N9KiS28aUkjKGkJbHlS3YI9htgLRRM";
+        document.getElementsByTagName('head')[0].appendChild(meta);
+    </script>
+    ''', unsafe_allow_html=True)
 
 # Estilos CSS Premium para Amazon/Tech
 st.markdown("""
@@ -23,6 +31,7 @@ st.markdown("""
     .stButton>button:hover { background-color: #e68a00; color: white; }
     .trend-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; border-top: 5px solid #ff4b4b; }
     .badge { background-color: #ff4b4b; color: white; padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+    h3 { color: #1a1a1a; font-family: 'Helvetica', sans-serif; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -45,14 +54,14 @@ with st.sidebar:
     afiliado_id = "unlimited0f3-20"
     
     st.divider()
-    st.info("Esta web detecta lo que el mundo busca en este segundo para ofrecerte las mejores ofertas.")
+    st.info("Esta web detecta tendencias en tiempo real para generar ofertas automáticas.")
 
 # 3. MOTORES DE BÚSQUEDA (TENDENCIAS Y NOTICIAS)
 @st.cache_data(ttl=600) # Se actualiza cada 10 minutos
 def obtener_tendencias_vivas():
     try:
         pytrends = TrendReq(hl='en-US', tz=360)
-        # Obtenemos tendencias de búsqueda de EE.UU. (el mercado más fuerte)
+        # Obtenemos tendencias de búsqueda de EE.UU.
         df = pytrends.trending_searches(pn='united_states')
         return df[0].tolist()
     except:
@@ -60,18 +69,22 @@ def obtener_tendencias_vivas():
         return ["iPhone 17", "Nvidia Blackwell", "PlayStation 6", "Amazon Prime Deals", "Smart Home Tech"]
 
 def buscar_noticias_y_ofertas(keyword, target_lang):
+    # Limpiamos la keyword para evitar errores de URL (InvalidURL)
+    keyword_encoded = urllib.parse.quote(keyword)
+    
     translator = GoogleTranslator(source='auto', target=target_lang)
     # Buscamos en Google News la tendencia + tech deals
-    rss_url = f"https://news.google.com/rss/search?q={keyword}+technology+deals&hl=en-US&gl=US&ceid=US:en"
+    rss_url = f"https://news.google.com/rss/search?q={keyword_encoded}+technology+deals&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(rss_url)
     
     items = []
-    for entry in feed.entries[:2]: # 2 noticias potentes por tendencia
+    for entry in feed.entries[:2]: # 2 noticias por tendencia
         try:
             titulo_original = entry.title.split(' - ')[0]
             titulo_traducido = translator.translate(titulo_original)
-            # Link de Amazon optimizado para la tendencia
-            link_amazon = f"https://www.amazon{amazon_suffix}/s?k={keyword}&tag={afiliado_id}"
+            
+            # Link de Amazon optimizado y codificado
+            link_amazon = f"https://www.amazon{amazon_suffix}/s?k={keyword_encoded}&tag={afiliado_id}"
             
             items.append({
                 "titulo": titulo_traducido,
@@ -103,7 +116,7 @@ for index, trend in enumerate(tendencias[:10]): # Analizamos las 10 principales
             <div class="trend-card">
                 <span class="badge">Trending Now: {trend}</span>
                 <h3 style="margin-top:10px;">{noticia['titulo']}</h3>
-                <p style="color: #555; font-size: 0.9em;">Detectado en buscadores hace unos segundos.</p>
+                <p style="color: #555; font-size: 0.9em;">Detectado en buscadores globales hace instantes.</p>
             </div>
             """, unsafe_allow_html=True)
             

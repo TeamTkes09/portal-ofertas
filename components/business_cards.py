@@ -2,10 +2,11 @@ import streamlit as st
 import urllib.parse
 import random
 
-def render_card(nombre, costo, reventa, riesgo, query):
-    ganancia = reventa - costo
-    roi = int((ganancia/costo)*100)
+# ESTA LÍNEA ES LA QUE BUSCA EL ERROR:
+def render_investment_section(suffix):
     st.subheader("💰 Oportunidades de Arbitraje y Reventa")
+    
+    # ... (aquí va todo el código de las tarjetas que pusimos antes)
     
     # Lista de productos preconfigurados (puedes añadir más aquí)
     oportunidades = [

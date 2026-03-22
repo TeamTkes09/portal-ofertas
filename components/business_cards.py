@@ -4,17 +4,17 @@ def render_investment_section(suffix, lista_productos):
     st.markdown("### 🎯 Oportunidades Seleccionadas (Alta Rentabilidad)")
     st.caption(f"Mostrando {len(lista_productos)} activos detectados en Amazon{suffix}")
 
-    # Creamos las 4 columnas
+    # Creamos la rejilla de 4 columnas
     cols = st.columns(4)
 
     for i, op in enumerate(lista_productos):
         with cols[i % 4]:
-            # Cálculos de ROI
+            # Cálculos rápidos
             margen = op['v'] - op['c']
             roi = int((margen / op['c']) * 100)
             amz_url = f"https://www.amazon{suffix}/s?k={op['q']}&tag=tu-tag-20"
 
-            # Diseño de la tarjeta en un solo bloque HTML
+            # TODO EL HTML VA DENTRO DE ESTA VARIABLE f-string
             card_html = f"""
             <div style="
                 background-color: #1e293b; 
@@ -30,7 +30,7 @@ def render_investment_section(suffix, lista_productos):
             ">
                 <div style="width: 100%;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <span style="background: {op['clr']}; color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px; text-transform: uppercase;">
+                        <span style="background: {op['clr']}; color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px;">
                             {op['cat']}
                         </span>
                         <span style="color: #94a3b8; font-size: 10px; font-weight: bold;">ID: {op['id']}</span>
@@ -88,4 +88,5 @@ def render_investment_section(suffix, lista_productos):
                 </a>
             </div>
             """
+            # ESTA ES LA LÍNEA QUE TRANSFORMA EL TEXTO EN DISEÑO
             st.markdown(card_html, unsafe_allow_html=True)

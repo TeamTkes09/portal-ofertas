@@ -47,3 +47,6 @@ productos_hardware = [
         ]
     }
 ]
+# ESTA ES LA FUNCIÓN QUE FALTABA
+def get_all_products():
+    return productos_hardware

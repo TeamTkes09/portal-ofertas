@@ -14,7 +14,15 @@ st.set_page_config(
 market = geo_logic.get_market_context()
 suffix = market['s']
 oportunidades = products.get_all_products()
+# En app.py, después de cargar los productos:
+oportunidades = products.get_all_products()
 
+# ORDENAR POR ROI (De mayor a menor)
+oportunidades = sorted(
+    oportunidades, 
+    key=lambda x: ((x['v'] - x['c']) / x['c']), 
+    reverse=True
+)
 # 3. Renderizar Cabecera
 header.render_hero(market['n'])
 

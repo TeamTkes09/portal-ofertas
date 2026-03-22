@@ -4,9 +4,13 @@ from components import header, news_feed, business_cards, footer
 
 # 1. Configuración de página (Debe ser la primera instrucción)
 st.set_page_config(
-    page_title="TechFlash780 Elite",
-    page_icon="💎",
-    layout="wide"
+    page_title="TechFlash Pro | Arbitraje de Hardware y IA en Tiempo Real",
+    page_icon="⚡",
+    layout="wide",
+    menu_items={
+        'Get Help': 'https://tu-dominio.com',
+        'About': "# TechFlash Pro: La terminal líder en oportunidades de arbitraje 2026."
+    }
 )
 
 # 2. Cargar contexto de mercado (País y Amazon)

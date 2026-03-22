@@ -2,23 +2,25 @@ import streamlit as st
 from utils import geo_logic
 from components import header, news_feed, business_cards, footer
 
-# 1. Configuración de página (Base)
+# 1. Configuración obligatoria (debe ser la primera línea)
 st.set_page_config(page_title="TechFlash780 Elite", page_icon="💎", layout="wide")
 
-# 2. Cargar Contexto de Mercado (GPS)
+# 2. Cargar datos del mercado
 market = geo_logic.get_market_context()
 
-# 3. Renderizar Header (Hero + Aviso inicial)
+# 3. Renderizar Header
 header.render_hero(market['n'])
 
-# 4. Sistema de Pestañas (Organización Modular)
+# 4. Organización por Pestañas
 tab_biz, tab_news = st.tabs(["💰 OPORTUNIDADES DE NEGOCIO", "🌐 ACTUALIDAD TECNOLÓGICA"])
 
 with tab_biz:
+    # Aquí llamamos a la función. 
+    # Asegúrate de que business_cards.py use st.markdown(..., unsafe_allow_html=True)
     business_cards.render_investment_section(market['s'])
 
 with tab_news:
     news_feed.render_news_section()
 
-# 5. Renderizar Footer (Blindaje Final)
+# 5. Footer Legal
 footer.render_legal_bunker("TechFlash780")

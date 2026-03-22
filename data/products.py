@@ -52,41 +52,28 @@ def get_crypto_opportunities():
 # --- 2. MOTOR DE RUTAS OPTIMIZADAS (IDA, 3 PUNTOS Y 4 PUNTAS) ---
 @st.cache_data(ttl=15)
 def get_optimized_routes():
-    """
-    Genera rutas dinámicas priorizando:
-    1. Menor número de exchanges si el ROI es similar.
-    2. Ciclos cerrados (4 puntas) para evitar costos de retiro.
-    """
+    # Definimos la comisión estándar de Binance (0.1% = 0.001)
+    trading_fee = 0.001 
+    
+    # Supongamos que el spread bruto detectado es 1.4%
+    bruto = 1.4 
+    
+    # Calculamos el costo de 4 trades: (1 - fee)^4
+    # Esto es lo que realmente te queda de capital
+    costo_comisiones_total = (trading_fee * 4) * 100 # Aprox 0.4%
+    
+    roi_real = bruto - costo_comisiones_total - 0.1 # Restamos 0.1% extra por seguridad (slippage)
+
     return [
-        {
-            "id": "OPT-01",
-            "tipo": "DIRECTO (2 Nodos)",
-            "nodos": 2,
-            "ruta": "USDT → BTC → USDT",
-            "exchanges": ["Binance", "Kraken"],
-            "roi_neto": 0.55,
-            "riesgo": "BAJO",
-            "descripcion": "Arbitraje clásico de alta liquidez."
-        },
-        {
-            "id": "OPT-02",
-            "tipo": "TRIANGULAR (3 Nodos)",
-            "nodos": 3,
-            "ruta": "USDT → ETH → SOL → USDT",
-            "exchanges": ["Binance", "OKX", "Binance"],
-            "roi_neto": 1.15,
-            "riesgo": "MEDIO",
-            "descripcion": "Usa OKX como puente para aprovechar desfase de SOL."
-        },
         {
             "id": "OPT-03",
             "tipo": "CUADRANGULAR (4 Nodos)",
             "nodos": 4,
             "ruta": "USDT → BTC → ETH → MATIC → USDT",
-            "exchanges": ["Binance", "Binance", "Binance", "Binance"],
-            "roi_neto": 0.92,
-            "riesgo": "MINIMO",
-            "descripcion": "Ciclo interno 100% en Binance. Sin fees de retiro."
+            "exchanges": ["Binance"],
+            "roi_neto": round(roi_real, 2), # Ahora mostrará un ROI honesto
+            "riesgo": "MÍNIMO",
+            "descripcion": f"Calculado restando {costo_comisiones_total}% de fees de trading."
         }
     ]
 

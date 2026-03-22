@@ -14,32 +14,49 @@ def render_investment_section(suffix, lista_productos):
             st.components.v1.html(get_card_template(op, roi, round(venta-costo,2), amz_url, filas), height=225)
 
 def render_crypto_section(lista_crypto):
-    st.subheader("🧮 Calculadora de Arbitraje Crypto")
-    capital = st.number_input("Capital Operativo (USD)", min_value=100, value=1000)
+    st.markdown("### 🗺️ Ruta de Ejecución por Red")
     
-    cols = st.columns(len(lista_crypto))
-    for i, c in enumerate(lista_crypto):
-        with cols[i]:
-            buy_p = c['exchanges'][0]['price']
-            sell_p = c['exchanges'][1]['price']
-            ganancia_bruta = (capital / buy_p * sell_p) - capital
-            costo_red = c['fee_red'] * sell_p
-            neto = ganancia_bruta - costo_red
-            
-            st.markdown(f"""
-            <div style="background:#1e293b; padding:20px; border-radius:12px; border:1px solid #334155; color:white;">
-                <h3 style="color:#facc15;margin:0;">{c['coin']}</h3>
-                <small>Red: {c['red']}</small>
-                <hr style="opacity:0.1;">
-                <div style="font-size:12px;margin-bottom:10px;">
-                    Compra: <b>${buy_p}</b><br>Venta: <b>${sell_p}</b>
-                </div>
-                <div style="background:#0f172a; padding:10px; border-radius:8px;">
-                    <small>Fee Red: -${costo_red:.2f}</small><br>
-                    <b style="color:#22c55e;">Neto: ${neto:.2f}</b>
-                </div>
-                <div style="text-align:center; margin-top:10px; font-size:22px; font-weight:bold; color:#22c55e;">
-                    {((neto/capital)*100):.2f}%
-                </div>
+    # Encabezados de la tabla
+    h1, h2, h3, h4, h5, h6 = st.columns([1, 1.5, 1.5, 1, 1, 1])
+    h1.write("**Moneda**")
+    h2.write("**🛒 COMPRA EN**")
+    h3.write("**💰 VENDE EN**")
+    h4.write("**🌐 Red**")
+    h5.write("**⛽ Fee**")
+    h6.write("**📈 Neto**")
+    
+    st.divider()
+
+    for c in lista_crypto:
+        col1, col2, col3, col4, col5, col6 = st.columns([1, 1.5, 1.5, 1, 1, 1])
+        
+        # Cálculo de ganancia restando el Fee de Red
+        diff = c['precio_venta'] - c['precio_compra']
+        ganancia_neta = diff - c['fee_usd']
+        
+        col1.write(f"**{c['coin']}**")
+        
+        # UI Exchange Compra
+        col2.markdown(f"""
+            <div style="background:#064e3b; padding:8px; border-radius:5px; text-align:center; border: 1px solid #22c55e;">
+                <small style="color:#4ade80;">{c['compra_en']}</small><br>
+                <b style="color:white;">${c['precio_compra']:,}</b>
             </div>
-            """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+        
+        # UI Exchange Venta
+        col3.markdown(f"""
+            <div style="background:#450a0a; padding:8px; border-radius:5px; text-align:center; border: 1px solid #f87171;">
+                <small style="color:#f87171;">{c['vende_en']}</small><br>
+                <b style="color:white;">${c['precio_venta']:,}</b>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        col4.caption(f"{c['red']}\n({c['vel']})")
+        col5.write(f"${c['fee_usd']}")
+        
+        # Color según rentabilidad
+        if ganancia_neta > 0:
+            col6.success(f"+${ganancia_neta:.2f}")
+        else:
+            col6.error(f"${ganancia_neta:.2f}")

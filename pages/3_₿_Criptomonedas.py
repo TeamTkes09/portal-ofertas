@@ -1,8 +1,13 @@
 import streamlit as st
+import pandas as pd  # <--- ESTA ERA LA LÍNEA QUE FALTABA
 import time
 from data.products import get_crypto_opportunities, buscar_ciclo_infinito, ejecutar_ruta_dinamica
 
 st.set_page_config(page_title="Radar de Arbitraje N-Puntas", layout="wide")
+
+# --- INICIALIZAR LOG DE AUDITORÍA (PERSISTENTE EN LA SESIÓN) ---
+if 'audit_log' not in st.session_state:
+    st.session_state['audit_log'] = []
 
 st.title("₿ Arbitraje Inteligente de Ciclo Infinito")
 st.caption("Algoritmo de Grafos Bellman-Ford detectando ineficiencias en tiempo real.")
@@ -14,8 +19,7 @@ with st.sidebar:
     secret_key = st.text_input("Secret Key", type="password")
     st.divider()
     monto_operar = st.number_input("Capital USDT a utilizar", min_value=15.0, value=80.0, step=5.0)
-    min_roi_exec = st.slider("ROI Mínimo para Auto-Trade (%)", 0.1, 2.0, 0.5)
-    st.info("💡 Asegúrate de tener BNB en tu cuenta para reducir comisiones a 0.075%.")
+    st.info("💡 Recuerda: El descuento de BNB (0.075%) es vital para rutas largas.")
 
 # --- BLOQUE 1: MONITOR DE MERCADO (TOP 200) ---
 st.subheader("📊 Monitor de Spreads Directos")
@@ -23,6 +27,8 @@ data_200 = get_crypto_opportunities()
 if data_200:
     df = pd.DataFrame(data_200)
     st.dataframe(df.head(10), use_container_width=True, hide_index=True)
+else:
+    st.warning("No se pudieron cargar datos del monitor. Reintentando...")
 
 st.divider()
 
@@ -36,7 +42,7 @@ with col1:
         if not api_key or not secret_key:
             st.warning("⚠️ Ingresa tus llaves API en el menú lateral.")
         else:
-            with st.spinner("Analizando miles de combinaciones..."):
+            with st.spinner("Analizando matrices de liquidez..."):
                 res = buscar_ciclo_infinito(api_key, secret_key)
                 
                 if res['status'] == 'success':
@@ -44,20 +50,20 @@ with col1:
                     st.session_state['ultimo_roi'] = res['roi']
                     
                     st.metric("Mejor ROI Hallado", f"{res['roi']:.3f}%", 
-                              delta="Rentable" if res['roi'] > 0 else "Pérdida")
+                              delta="Rentable" if res['roi'] > 0.05 else "Bajo Margen")
                     
                     ruta_str = " ➡️ ".join(res['ruta'])
-                    st.code(f"RUTA: {ruta_str}", language="text")
+                    st.code(f"RUTA SUGERIDA: {ruta_str}", language="text")
                 else:
-                    st.info("No se hallaron ciclos rentables en este segundo.")
+                    st.info("No se hallaron ciclos rentables en este escaneo.")
 
 with col2:
     if 'ultima_ruta' in st.session_state:
-        st.write("### ⚡ Ejecución Instantánea")
-        st.write(f"Ruta cargada: **{len(st.session_state['ultima_ruta'])} saltos**")
+        st.write("### ⚡ Panel de Ejecución")
+        st.write(f"Nodos en ruta: **{len(st.session_state['ultima_ruta'])}**")
         
-        if st.button("🔥 DISPARAR OPERACIÓN", type="primary", use_container_width=True):
-            with st.status("Ejecutando saltos en Binance API...", expanded=True) as status:
+        if st.button("🔥 EJECUTAR TRADE ATÓMICO", type="primary", use_container_width=True):
+            with st.status("Lanzando órdenes al motor de Binance...", expanded=True) as status:
                 inicio = time.time()
                 ejecucion = ejecutar_ruta_dinamica(
                     api_key, secret_key, 
@@ -67,22 +73,25 @@ with col2:
                 fin = time.time()
                 
                 if ejecucion['status'] == 'success':
-                    status.update(label=f"✅ ¡Éxito! Ciclo completado en {fin-inicio:.2f}s", state="complete")
+                    ganancia = float(ejecucion['final']) - monto_operar
+                    status.update(label=f"✅ ¡Ciclo Completado en {fin-inicio:.2f}s!", state="complete")
                     st.balloons()
-                    st.success(f"Finalizado con {ejecucion['final']} USDT")
+                    
+                    # Guardar en el Log
+                    st.session_state['audit_log'].append({
+                        "Hora": time.strftime("%H:%M:%S"),
+                        "Ruta": " -> ".join(st.session_state['ultima_ruta']),
+                        "ROI %": f"{st.session_state['ultimo_roi']:.3f}%",
+                        "Resultado": f"{ganancia:.4f} USDT"
+                    })
                 else:
-                    status.update(label="❌ Error en la cadena", state="error")
+                    status.update(label="❌ Fallo en ejecución", state="error")
                     st.error(ejecucion['message'])
 
-# --- MODO CENTINELA (AUTO-SCAN) ---
+# --- BLOQUE 3: REGISTRO DE OPERACIONES ---
 st.divider()
-st.subheader("🤖 Modo Centinela")
-auto_scan = st.toggle("Activar escaneo automático cada 10 segundos")
-
-if auto_scan:
-    if not api_key:
-        st.error("Necesitas API Key para el modo Centinela.")
-    else:
-        st.toast("Modo Centinela Activo. Buscando brechas...")
-        # Aquí podrías usar un loop de tiempo (time.sleep) pero Streamlit 
-        # prefiere st.rerun() o fragmentos. Por ahora, úsalo manual para seguridad.
+st.subheader("📜 Log de Auditoría (Sesión Actual)")
+if st.session_state['audit_log']:
+    st.table(pd.DataFrame(st.session_state['audit_log']))
+else:
+    st.caption("Aún no se han ejecutado operaciones en esta sesión.")

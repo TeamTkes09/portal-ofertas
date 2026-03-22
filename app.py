@@ -24,7 +24,7 @@ with tab_biz:
 
 with tab_news:
     # Renderiza el motor de noticias en tiempo real
-    news_feed.render_news_section()
+    news_feed.render_news_section(suffix=".com")
 
 # 5. Renderizar Footer y Blindaje Legal Final
 footer.render_legal_bunker("TechFlash780")

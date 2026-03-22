@@ -1,37 +1,49 @@
 # data/products.py
 
-def get_all_products():
-    return [
-        {"id": "H01", "n": "NVIDIA RTX 5090 Founders", "c": 1999, "v": 2850, "r": "ALTO", "clr": "#ef4444", "q": "rtx 5090 founders edition", "cat": "💾 HARDWARE"},
-        {"id": "H02", "n": "SSD Samsung 990 PRO 4TB", "c": 280, "v": 410, "r": "BAJO", "clr": "#22c55e", "q": "samsung 990 pro 4tb", "cat": "💾 HARDWARE"},
-        {"id": "H03", "n": "Intel Core i9-14900KS", "c": 620, "v": 850, "r": "MEDIO", "clr": "#facc15", "q": "i9-14900ks processor", "cat": "💾 HARDWARE"},
-        {"id": "H04", "n": "ASUS ROG Swift OLED 4K", "c": 899, "v": 1350, "r": "MEDIO", "clr": "#facc15", "q": "asus rog swift oled 4k", "cat": "💾 HARDWARE"},
-        {"id": "H05", "n": "Corsair Dominator 64GB DDR5", "c": 210, "v": 340, "r": "BAJO", "clr": "#22c55e", "q": "corsair dominator titanium 64gb", "cat": "💾 HARDWARE"},
-        {"id": "H06", "n": "RTX 4060 Ti (Open Box)", "c": 340, "v": 450, "r": "ALTO", "clr": "#ef4444", "q": "rtx 4060 ti open box", "cat": "💾 HARDWARE"},
-        {"id": "H07", "n": "Seagate Exos 20TB NAS", "c": 310, "v": 495, "r": "BAJO", "clr": "#22c55e", "q": "seagate exos 20tb drive", "cat": "💾 HARDWARE"},
-        {"id": "H08", "n": "Ryzen 9 7950X3D Bundle", "c": 550, "v": 790, "r": "MEDIO", "clr": "#facc15", "q": "ryzen 9 7950x3d combo", "cat": "💾 HARDWARE"},
-        {"id": "H09", "n": "Lian Li O11 Dynamic EVO", "c": 140, "v": 210, "r": "BAJO", "clr": "#22c55e", "q": "lian li o11 dynamic evo", "cat": "💾 HARDWARE"},
-        {"id": "H10", "n": "Crucial T705 2TB Gen5 SSD", "c": 240, "v": 385, "r": "MEDIO", "clr": "#facc15", "q": "crucial t705 2tb ssd", "cat": "💾 HARDWARE"},
-        {"id": "H11", "n": "RTX 4080 Super Refurbished", "c": 820, "v": 1150, "r": "ALTO", "clr": "#ef4444", "q": "rtx 4080 super refurbished", "cat": "💾 HARDWARE"},
-        {"id": "H12", "n": "Gigabyte Z790 AORUS Master", "c": 380, "v": 540, "r": "BAJO", "clr": "#22c55e", "q": "gigabyte z790 aorus master", "cat": "💾 HARDWARE"},
-        {"id": "H13", "n": "Noctua NH-D15 chromax.black", "c": 115, "v": 165, "r": "BAJO", "clr": "#22c55e", "q": "noctua nh-d15 chromax black", "cat": "💾 HARDWARE"},
-        {"id": "H14", "n": "WD_BLACK 8TB SN850X", "c": 650, "v": 920, "r": "MEDIO", "clr": "#facc15", "q": "wd black sn850x 8tb", "cat": "💾 HARDWARE"},
-        {"id": "H15", "n": "G.Skill Trident Z5 32GB", "c": 125, "v": 195, "r": "BAJO", "clr": "#22c55e", "q": "g skill trident z5 32gb", "cat": "💾 HARDWARE"},
-        {"id": "H16", "n": "MSI Suprim Liquid X 4090", "c": 1750, "v": 2400, "r": "ALTO", "clr": "#ef4444", "q": "msi suprim liquid x 4090", "cat": "💾 HARDWARE"},
-        {"id": "H17", "n": "Be Quiet! Dark Power Pro 13", "c": 350, "v": 490, "r": "BAJO", "clr": "#22c55e", "q": "be quiet dark power pro 13", "cat": "💾 HARDWARE"},
-        {"id": "H18", "n": "Lote x5 SSD Kingston 1TB", "c": 220, "v": 380, "r": "ALTO", "clr": "#ef4444", "q": "kingston nv2 1tb pack", "cat": "💾 HARDWARE"},
-        {"id": "H19", "n": "Elgato 4K60 Pro MK.2", "c": 210, "v": 295, "r": "BAJO", "clr": "#22c55e", "q": "elgato 4k60 pro mk2", "cat": "💾 HARDWARE"},
-        {"id": "H20", "n": "NZXT Kraken Elite 360", "c": 260, "v": 350, "r": "MEDIO", "clr": "#facc15", "q": "nzxt kraken elite 360", "cat": "💾 HARDWARE"},
-        {"id": "H21", "n": "Intel Arc A770 16GB", "c": 280, "v": 410, "r": "ALTO", "clr": "#ef4444", "q": "intel arc a770 16gb", "cat": "💾 HARDWARE"},
-        {"id": "H22", "n": "Sabrent Rocket 4 Plus 4TB", "c": 390, "v": 560, "r": "BAJO", "clr": "#22c55e", "q": "sabrent rocket 4 plus 4tb", "cat": "💾 HARDWARE"},
-        {"id": "H23", "n": "Lote x10 DDR4 16GB 3200", "c": 300, "v": 550, "r": "ALTO", "clr": "#ef4444", "q": "ddr4 16gb ram bulk", "cat": "💾 HARDWARE"},
-        {"id": "H24", "n": "EVGA SuperNOVA 1000G+", "c": 180, "v": 265, "r": "BAJO", "clr": "#22c55e", "q": "evga supernova 1000g plus", "cat": "💾 HARDWARE"},
-        {"id": "H25", "n": "ASUS TUF Gaming B650-Plus", "c": 190, "v": 280, "r": "BAJO", "clr": "#22c55e", "q": "asus tuf gaming b650 plus", "cat": "💾 HARDWARE"},
-        {"id": "H26", "n": "Phanteks NV7 Case", "c": 210, "v": 299, "r": "MEDIO", "clr": "#facc15", "q": "phanteks nv7 chassis", "cat": "💾 HARDWARE"},
-        {"id": "H27", "n": "Thermal Grizzly Kryonaut", "c": 25, "v": 45, "r": "BAJO", "clr": "#22c55e", "q": "thermal grizzly kryonaut extreme", "cat": "💾 HARDWARE"},
-        {"id": "H28", "n": "EKWB AIO Elite 360mm", "c": 180, "v": 275, "r": "MEDIO", "clr": "#facc15", "q": "ekwb aio elite 360", "cat": "💾 HARDWARE"},
-        {"id": "H29", "n": "ASRock Taichi Radeon 7900", "c": 920, "v": 1250, "r": "ALTO", "clr": "#ef4444", "q": "asrock taichi 7900 xtx", "cat": "💾 HARDWARE"},
-        {"id": "H30", "n": "TeamGroup T-Force Delta 32GB", "c": 105, "v": 165, "r": "BAJO", "clr": "#22c55e", "q": "teamgroup t-force delta ddr5", "cat": "💾 HARDWARE"},
-        {"id": "H31", "n": "Fractal Design North Case", "c": 130, "v": 210, "r": "BAJO", "clr": "#22c55e", "q": "fractal design north", "cat": "💾 HARDWARE"},
-        {"id": "H32", "n": "Lote Fan Pack x10 ARGB", "c": 85, "v": 195, "r": "ALTO", "clr": "#ef4444", "q": "argb case fan bulk 120mm", "cat": "💾 HARDWARE"}
-    ]
+productos_hardware = [
+    {
+        'id': 'H32',
+        'n': 'Lote Fan Pack x10 ARGB 120mm',
+        'cat': 'HARDWARE',
+        'c': 85,  # Costo en Amazon
+        'v': 195, # Venta máxima estimada
+        'q': 'argb case fan bulk 120mm',
+        'clr': '#ef4444',
+        'r': 'ALTO',
+        'comparativa': [
+            {'sitio': 'Google Shopping', 'precio': 135, 'url': 'https://www.google.com/search?q=argb+fan+10+pack+price'},
+            {'sitio': 'eBay (Promedio)', 'precio': 155, 'url': 'https://www.ebay.com/sch/i.html?_nkw=120mm+argb+fan+lot'},
+            {'sitio': 'Tienda Local / Retail', 'precio': 195, 'url': 'https://www.google.com/search?q=tienda+computacion+ventiladores+argb'}
+        ]
+    },
+    {
+        'id': 'H05',
+        'n': 'Corsair Dominator Titanium 64GB DDR5',
+        'cat': 'HARDWARE',
+        'c': 210,
+        'v': 340,
+        'q': 'corsair dominator titanium 64gb ddr5',
+        'clr': '#22c55e',
+        'r': 'BAJO',
+        'comparativa': [
+            {'sitio': 'Google Shopping', 'precio': 285, 'url': 'https://www.google.com/search?q=corsair+dominator+64gb+ddr5+price'},
+            {'sitio': 'Newegg', 'precio': 310, 'url': 'https://www.newegg.com/p/pl?d=corsair+dominator+64gb'},
+            {'sitio': 'Tienda Local / Retail', 'precio': 340, 'url': 'https://www.google.com/search?q=corsair+dominator+titanium+precio+local'}
+        ]
+    },
+    {
+        'id': 'H30',
+        'n': 'TeamGroup T-Force Delta 32GB RGB',
+        'cat': 'HARDWARE',
+        'c': 105,
+        'v': 165,
+        'q': 'teamgroup t-force delta ddr5 32gb',
+        'clr': '#22c55e',
+        'r': 'BAJO',
+        'comparativa': [
+            {'sitio': 'Google Shopping', 'precio': 130, 'url': 'https://www.google.com/search?q=t-force+delta+32gb+ddr5+price'},
+            {'sitio': 'eBay', 'precio': 145, 'url': 'https://www.ebay.com/sch/i.html?_nkw=t-force+delta+32gb+ddr5'},
+            {'sitio': 'Tienda Local / Retail', 'precio': 165, 'url': 'https://www.google.com/search?q=t-force+delta+32gb+precio+retail'}
+        ]
+    }
+]

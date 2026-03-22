@@ -1,77 +1,74 @@
 import streamlit as st
 import random
 
+# --- 1. PRODUCTOS FÍSICOS (REFRESCO 15 MIN) ---
 @st.cache_data(ttl=900)
 def get_real_time_opportunities():
-    # Base de datos real para 2026
-    items = [
-        {"n": "Apple AirTag 4-Pack", "cat": "TECH", "c": 75, "v": 99, "q": "B08ZG76197"},
-        {"n": "Stanley Quencher 40oz", "cat": "HOGAR", "c": 35, "v": 85, "q": "B0C1M1YF9P"},
-        {"n": "Sony WH-1000XM5", "cat": "TECH", "c": 280, "v": 398, "q": "B09XS7JWHH"},
-        {"n": "LEGO Ghost & Phantom", "cat": "JUGUETES", "c": 125, "v": 159, "q": "B0BXQ4B5RL"},
-        {"n": "Ninja Creami Deluxe", "cat": "HOGAR", "c": 160, "v": 249, "q": "B0B94Z9V9B"},
-        {"n": "Olaplex No. 3", "cat": "BELLEZA", "c": 18, "v": 30, "q": "B0086OT8S2"}
+    """Genera 32 oportunidades de arbitraje retail con datos de 2026"""
+    catalogo_maestro = [
+        {"n": "Apple AirTag (4 Pack)", "cat": "TECH", "c_base": 79, "v_base": 99, "q": "B08ZG76197"},
+        {"n": "Stanley Quencher 40oz", "cat": "HOGAR", "c_base": 35, "v_base": 85, "q": "B0C1M1YF9P"},
+        {"n": "Sony WH-1000XM5", "cat": "TECH", "c_base": 285, "v_base": 399, "q": "B09XS7JWHH"},
+        {"n": "LEGO Star Wars Ghost", "cat": "JUGUETES", "c_base": 128, "v_base": 159, "q": "B0BXQ4B5RL"},
+        {"n": "Ninja Creami Deluxe", "cat": "HOGAR", "c_base": 165, "v_base": 245, "q": "B0B94Z9V9B"},
+        {"n": "Logitech MX Master 3S", "cat": "TECH", "c_base": 82, "v_base": 109, "q": "B09HM94VDS"},
+        {"n": "Olaplex No. 3 Hair", "cat": "BELLEZA", "c_base": 18, "v_base": 30, "q": "B0086OT8S2"},
+        {"n": "DJI Mini 4 Pro Combo", "cat": "TECH", "c_base": 880, "v_base": 1099, "q": "B0CHMS6S46"}
     ]
     
-    final_list = []
+    productos = []
     for i in range(32):
-        base = items[i % len(items)]
-        # Fluctuación de mercado real cada 15 min
-        var = random.uniform(0.98, 1.02)
-        costo_final = round(base['c'] * var, 2)
-        final_list.append({
-            'id': f"SKU-{i}", 'n': f"{base['n']} (Lote {i+1})", 'cat': base['cat'],
-            'c': costo_final, 'v': base['v'], 'q': base['q'], 'r': 'BAJO',
+        base = catalogo_maestro[i % len(catalogo_maestro)]
+        # Simulación de volatilidad de precios de Amazon (+/- 2%)
+        variacion = random.uniform(0.98, 1.02)
+        costo_actual = round(base['c_base'] * variacion, 2)
+        venta_actual = round(base['v_base'], 2)
+        
+        productos.append({
+            'id': f"SKU-{2026}-{i:03d}",
+            'n': f"{base['n']} - Lote {i+1}",
+            'cat': base['cat'],
+            'c': costo_actual,
+            'v': venta_actual,
+            'q': base['q'],
+            'r': "BAJO" if (venta_actual - costo_actual)/costo_actual > 0.3 else "MEDIO",
             'comparativa': [
-                {'sitio': 'ebay', 'precio': round(base['v']*0.9, 2)},
-                {'sitio': 'google', 'precio': round(base['v']*0.95, 2)},
-                {'sitio': 'shopify', 'precio': round(base['v']*1.05, 2)}
+                {'sitio': 'ebay', 'precio': round(venta_actual * 0.92, 2)},
+                {'sitio': 'google', 'precio': round(venta_actual * 0.96, 2)},
+                {'sitio': 'shopify', 'precio': round(venta_actual * 1.04, 2)}
             ]
         })
-    return final_list
+    return productos
 
+# --- 2. NOTICIAS OPERATIVAS (VINCULADAS A PRODUCTOS) ---
 def get_news_events():
+    """Eventos de mercado que disparan oportunidades de compra"""
     return [
         {
-            "titulo": "📈 Viral: Escasez de Termos Stanley",
-            "descripcion": "Ruptura de stock en tiendas físicas por tendencia en redes. Precios suben.",
-            "fuente": "TikTok Trends", "hace": "5m", "impacto": "ALTO",
+            "titulo": "🔥 Viral: Stanley 'Azure' Agotado en Target",
+            "descripcion": "Ruptura de stock masiva en tiendas físicas. Los precios de reventa en Amazon han escalado un 45% en las últimas 24h.",
+            "fuente": "TikTok Trends",
+            "hace": "10 min",
+            "impacto": "ALTO",
             "productos_asociados": [
-                {'id': 'N1', 'n': 'Stanley Azure 40oz', 'cat': 'HOGAR', 'c': 45, 'v': 95, 'q': 'B0C1M1YF9P', 'r': 'BAJO', 'comparativa': [{'sitio': 'ebay', 'precio': 85}]}
+                {'id': 'NW1', 'n': 'Stanley 40oz Azure Edition', 'cat': 'HOGAR', 'c': 45.0, 'v': 95.0, 'q': 'B0C1M1YF9P', 'r': 'BAJO', 'comparativa': [{'sitio': 'ebay', 'precio': 85}]}
+            ]
+        },
+        {
+            "titulo": "📦 Escasez Global: SSD Samsung T7",
+            "descripcion": "Falla técnica en la planta de ensamble de Corea. Se espera una caída del 20% en el suministro para el próximo mes.",
+            "fuente": "Bloomberg Tech",
+            "hace": "40 min",
+            "impacto": "CRÍTICO",
+            "productos_asociados": [
+                {'id': 'NW2', 'n': 'Samsung T7 Shield 2TB', 'cat': 'TECH', 'c': 148.0, 'v': 210.0, 'q': 'B09VLK9W3S', 'r': 'MEDIO', 'comparativa': [{'sitio': 'ebay', 'precio': 185}]}
             ]
         }
     ]
 
-# Agrega o reemplaza esta función en data/products.py
+# --- 3. CRIPTOMONEDAS (DATOS TÉCNICOS PARA ARBITRAJE) ---
 @st.cache_data(ttl=300)
 def get_crypto_opportunities():
-    # Simulamos datos de API con spreads reales de mercado
-    return [
-        {
-            "coin": "BTC",
-            "red": "Bitcoin Network",
-            "fee_red": 0.0002, # ~12 USD
-            "exchanges": [
-                {"name": "Binance", "price": 64100, "type": "COMPRA"},
-                {"name": "Kraken", "price": 64650, "type": "VENTA"}
-            ]
-        },
-        {
-            "coin": "ETH",
-            "red": "Ethereum (ERC20)",
-            "fee_red": 0.0015, # ~5 USD
-            "exchanges": [
-                {"name": "Coinbase", "price": 3410, "type": "COMPRA"},
-                {"name": "Binance", "price": 3465, "type": "VENTA"}
-            ]
-        },
-        {
-            "coin": "SOL",
-            "red": "Solana",
-            "fee_red": 0.01, # ~1.5 USD
-            "exchanges": [
-                {"name": "Kraken", "price": 142.50, "type": "COMPRA"},
-                {"name": "Binance", "price": 146.20, "type": "VENTA"}
-            ]
-        }
-    ]
+    """Diferenciales entre exchanges incluyendo costos de red (Gas)"""
+    # Precios base simulados con fluctuación real
+    btc_ref = 64200 +

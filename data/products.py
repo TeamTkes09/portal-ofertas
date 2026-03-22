@@ -2,10 +2,10 @@ import streamlit as st
 import requests
 import pandas as pd
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=60) # Refresco real cada 60 segundos
 def get_crypto_opportunities():
     try:
-        # API Real: Top 200 monedas por Market Cap
+        # Conexión a la API Real de CoinGecko (Top 200 monedas)
         url = "https://api.coingecko.com/api/v3/coins/markets"
         params = {
             "vs_currency": "usd",
@@ -14,45 +14,44 @@ def get_crypto_opportunities():
             "page": 1,
             "sparkline": False
         }
-        # Timeout de 10 segundos para no bloquear la web
-        response = requests.get(url, params=params, timeout=10)
+        # Timeout corto para evitar que la web se cuelgue
+        response = requests.get(url, params=params, timeout=5)
         data = response.json()
 
         full_200 = []
         for coin in data:
             precio_real = coin['current_price']
-            # El "Spread" en arbitraje real suele ser de céntimos en el Top 10, 
-            # pero mayor en monedas pequeñas (Rank 100-200).
-            spread_market = 1.0025 # 0.25% de diferencia promedio entre exchanges
-            
-            # Lógica de Redes Reales
             sym = coin['symbol'].upper()
-            if sym == 'BTC': red, fee = "Bitcoin", 15.0
-            elif sym in ['ETH', 'USDT', 'USDC', 'LINK', 'SHIB']: red, fee = "ERC20", 8.0
-            elif sym in ['SOL', 'JUP', 'PYTH', 'BONK']: red, fee = "Solana", 0.01
+            
+            # Lógica de Redes Reales y sus comisiones de retiro (Fees)
+            # Esto es lo que da VALOR REAL: saber cuánto te cuesta mover el dinero.
+            if sym == 'BTC': red, fee = "Bitcoin Network", 15.0
+            elif sym in ['ETH', 'USDT', 'USDC', 'LINK']: red, fee = "ERC20 (Ethereum)", 8.5
+            elif sym in ['SOL', 'JUP', 'PYTH']: red, fee = "Solana", 0.01
             elif sym in ['MATIC', 'QUICK']: red, fee = "Polygon", 0.05
-            elif sym in ['AVAX', 'JOE']: red, fee = "Avalanche", 0.10
-            else: red, fee = "Red Propia/BSC", 0.50
+            elif sym in ['AVAX', 'JOE']: red, fee = "Avalanche", 0.15
+            else: red, fee = "BSC/Red Propia", 0.50
 
             full_200.append({
                 "Rank": coin['market_cap_rank'],
                 "Token": sym,
                 "Nombre": coin['name'],
                 "Precio Compra": precio_real,
-                "Precio Venta": round(precio_real * spread_market, 6),
+                # Simulamos el precio en el exchange de venta con un spread de mercado
+                "Precio Venta": round(precio_real * 1.0025, 6), 
                 "Red": red,
-                "Fee Red": fee,
+                "Fee Retiro": fee,
                 "Volumen 24h": coin['total_volume'],
                 "Cambio %": coin['price_change_percentage_24h']
             })
         return full_200
     except Exception as e:
-        # Si falla la API, devolvemos una lista vacía para no romper app.py
+        # Si la API falla, devolvemos una lista vacía y no rompemos la app
         return []
 
-# Mantener las otras funciones para no romper los otros tabs
+# Funciones de soporte para evitar errores de importación en app.py
 def get_real_time_opportunities():
-    return [] # Aquí puedes pegar tu lógica de productos anterior
+    return []
 
 def get_news_events():
-    return [] # Aquí puedes pegar tu lógica de noticias anterior
+    return []

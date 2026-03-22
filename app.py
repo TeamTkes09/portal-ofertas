@@ -1,97 +1,113 @@
 import streamlit as st
 import feedparser
-from deep_translator import GoogleTranslator
 import urllib.parse
 import requests
-import random
+import datetime
 
-# 1. CONFIGURACIÓN DE PORTAL DINÁMICO
-st.set_page_config(page_title="TechFlash Real-Time 🚀", page_icon="⚡", layout="wide")
+# 1. CONFIGURACIÓN DE SEGURIDAD GLOBAL
+st.set_page_config(page_title="TechFlash Global 🛡️", page_icon="⚖️", layout="wide")
 
 # --- CREDENCIALES ---
 MI_PAYPAL_USER = "TechFlash780"
 AMZ_TAG = "unlimited0f3-20" 
 
-# --- CSS: DISEÑO DE PORTAL (CONSERVAMOS EL ESTILO ELITE) ---
-st.html('''
+# --- CSS: ESTILO CORPORATIVO Y SECCIONES DE ADVERTENCIA ---
+st.html(f'''
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        .stApp { background: #0c0f14; color: #ffffff; font-family: 'Inter', sans-serif; }
-        .hero-banner {
-            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
-            padding: 40px 20px; border-radius: 25px; text-align: center; margin-bottom: 30px;
-        }
-        .news-card {
-            background: #161b22; padding: 20px; border-radius: 15px; 
-            margin-bottom: 15px; border: 1px solid #30363d; transition: 0.3s;
-        }
-        .news-card:hover { border-color: #fbbf24; background: #1c2128; }
-        .badge-live { background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; animation: blink 2s infinite; }
-        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        .stApp {{ background: #020408; color: #cbd5e1; font-family: 'Inter', sans-serif; }}
+        
+        .legal-notice {{
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 25px;
+        }}
+        
+        .global-footer {{
+            background: #000;
+            padding: 60px 20px;
+            margin-top: 100px;
+            border-top: 2px solid #1e293b;
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.8;
+        }}
+
+        .investment-card {{
+            background: #ffffff; color: #000; border-radius: 15px;
+            padding: 20px; margin-bottom: 20px;
+            border-bottom: 5px solid #22c55e;
+        }}
     </style>
 ''')
 
-# 2. MOTOR DE CONTENIDO REAL (Google News API via RSS)
-@st.cache_data(ttl=600) # Se actualiza cada 10 minutos automáticamente
-def obtener_noticias_reales(query, lang="es"):
-    translator = GoogleTranslator(source='auto', target=lang)
-    rss_url = f"https://news.google.com/rss/search?q={urllib.parse.quote(query)}&hl={lang}"
-    feed = feedparser.parse(rss_url)
-    noticias = []
-    for entry in feed.entries[:4]: # Tomamos las 4 más frescas
-        try:
-            texto_limpio = entry.title.split(' - ')[0]
-            noticias.append({
-                "titulo": translator.translate(texto_limpio),
-                "link": entry.link,
-                "fuente": entry.source.get('title', 'Tech News')
-            })
-        except: continue
-    return noticias
+# 2. DETECCIÓN DE REGIÓN (Para aplicar leyes locales)
+@st.cache_data
+def get_global_context():
+    try:
+        r = requests.get('https://ipapi.co/json/', timeout=3).json()
+        mapa = {"ES": ".es", "MX": ".com.mx", "US": ".com", "AR": ".com.be", "CL": ".cl", "CO": ".com.co"}
+        return {
+            "pais": r.get('country_name', 'Internacional'),
+            "suffix": mapa.get(r.get('country_code'), ".com"),
+            "ip": r.get('ip', 'Oculta')
+        }
+    except: return {"pais": "Internacional", "suffix": ".com", "ip": "0.0.0.0"}
 
-# 3. HEADER
+ctx = get_global_context()
+
+# 3. ADVERTENCIA DE ENTRADA (Mandatorio legal)
 st.markdown(f'''
-    <div class="hero-banner">
-        <h1 style="margin:0;">TECHFLASH <span style="color:#fbbf24;">LIVE</span></h1>
-        <p>Noticias y Ofertas Reales filtradas por IA</p>
+    <div class="legal-notice">
+        <strong>⚠️ AVISO LEGAL INTERNACIONAL:</strong> Al navegar en TechFlash desde <b>{ctx['pais']}</b>, usted acepta que el uso de esta información es bajo su propio riesgo. TechFlash780 no se responsabiliza por aranceles aduaneros, impuestos locales o restricciones de reventa en su jurisdicción.
     </div>
 ''', unsafe_allow_html=True)
 
-# 4. CUERPO: SECCIÓN HÍBRIDA
-col_main, col_side = st.columns([2, 1])
+# 4. CONTENIDO DE NEGOCIOS
+st.title("💹 TechFlash: Arbitraje Global")
+col1, col2 = st.columns(2)
 
-with col_main:
-    st.subheader("🌐 Última Hora en Tecnología")
-    # Buscamos noticias reales de diferentes temas para que NO se repitan
-    temas = ["inteligencia artificial", "nuevos lanzamientos tech", "hardware gaming"]
-    
-    for tema in temas:
-        noticias_reales = obtener_noticias_reales(tema)
-        if noticias_reales:
-            n = noticias_reales[0] # Tomamos la mejor de cada tema
-            st.markdown(f'''
-                <div class="news-card">
-                    <span class="badge-live">LIVE</span> 
-                    <small style="color:#888; margin-left:10px;">Fuente: {n['fuente']}</small>
-                    <h3 style="margin:10px 0; font-size:1.2rem;">{n['titulo']}</h3>
-                    <a href="{n['link']}" target="_blank" style="color:#fbbf24; text-decoration:none; font-weight:bold;">Leer noticia completa →</a>
-                </div>
-            ''', unsafe_allow_html=True)
+with col1:
+    st.markdown(f'''
+        <div class="investment-card">
+            <h3>📦 Lote Reventa Tech Pro</h3>
+            <p>Inversión estimada para {ctx['pais']}</p>
+            <h2 style="color:#16a34a;">ROI +45%</h2>
+            <a href="https://www.amazon{ctx['suffix']}/s?k=wholesale+tech&tag={AMZ_TAG}" target="_blank" 
+               style="background:#111; color:#fff; display:block; text-align:center; padding:10px; text-decoration:none; border-radius:5px; font-weight:bold;">
+               REVISAR EN AMAZON {ctx['suffix'].upper()}
+            </a>
+            <p style="font-size:9px; color:#666; margin-top:10px;">* El precio final incluye impuestos de Amazon pero no aranceles de importación locales.</p>
+        </div>
+    ''', unsafe_allow_html=True)
 
-with col_side:
-    st.subheader("🛒 Ofertas del Momento")
-    # Aquí conectamos con Amazon basado en tendencias
-    ofertas_queries = ["procesador", "teclado gamer", "monitor"]
-    for q in ofertas_queries:
-        url_amz = f"https://www.amazon.com/s?k={q}&tag={AMZ_TAG}"
-        st.markdown(f'''
-            <div style="background:#1e293b; padding:15px; border-radius:15px; margin-bottom:10px; border:1px solid #3b82f6;">
-                <p style="margin:0; font-size:14px; font-weight:bold;">Mejor precio en: {q.capitalize()}</p>
-                <a href="{url_amz}" target="_blank" style="display:block; margin-top:10px; background:#fbbf24; color:black; text-align:center; padding:8px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:12px;">VER EN AMAZON</a>
+# 5. EL "BLINDAJE" LEGAL DEFINITIVO (Footer Multinacional)
+st.markdown(f'''
+    <div class="global-footer">
+        <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <div>
+                <strong>1. DESCARGO DE AFILIACIÓN (FTC & EU COMPLIANCE)</strong><br>
+                TechFlash780 declara que este sitio web contiene enlaces de afiliados. Si usted realiza una compra a través de estos enlaces, recibimos una comisión sin costo adicional para usted. Este sitio no es propiedad de Amazon ni está avalado por Amazon Inc.<br><br>
+                <strong>2. NO ASESORAMIENTO FINANCIERO</strong><br>
+                El contenido de TechFlash tiene fines exclusivamente educativos e informativos. No constituye asesoramiento financiero, legal o fiscal. Los cálculos de ganancias son proyecciones hipotéticas basadas en datos históricos.
             </div>
-        ''', unsafe_allow_html=True)
-    
-    st.divider()
-    st.link_button("☕ Donar a TechFlash780", f"https://www.paypal.me/{MI_PAYPAL_USER}", use_container_width=True)
+            <div>
+                <strong>3. JURISDICCIÓN Y LEY APLICABLE</strong><br>
+                Este sitio web opera bajo la premisa de "Safe Harbor". El usuario es el único responsable de cumplir con las leyes de su país de residencia, incluyendo pero no limitado a: regulaciones de importación, impuestos sobre la renta (IVA/IGIC/ISR) y normativas de comercio electrónico locales.<br><br>
+                <strong>4. LIMITACIÓN DE RESPONSABILIDAD GLOBAL</strong><br>
+                Bajo ninguna circunstancia TechFlash780 será responsable de pérdidas directas o indirectas derivadas del uso de esta plataforma. La disponibilidad de ofertas se muestra "tal cual" (As-Is) según la API de terceros al momento {datetime.datetime.now().strftime("%H:%M UTC")}.
+            </div>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #334155; margin: 30px 0;">
+        <center>
+            <small>TechFlash780 Intelligence System © {datetime.datetime.now().year}. Todos los derechos reservados a nivel mundial.</small>
+        </center>
+    </div>
+''', unsafe_allow_html=True)
 
-st.caption("© 2026 TechFlash Real-Time Engine. Los datos se actualizan cada 10 minutos.")
+# 6. SOPORTE
+st.link_button("☕ Apoyar este Nodo de Inteligencia (PayPal)", f"https://www.paypal.me/{MI_PAYPAL_USER}", use_container_width=True)

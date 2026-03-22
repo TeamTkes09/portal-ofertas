@@ -76,18 +76,14 @@ def get_news_events():
 # --- 3. CRYPTO CON DATOS DE RED ---
 @st.cache_data(ttl=300)
 def get_crypto_opportunities():
-    btc_price = 64000 + random.randint(-200, 200)
+    # Precios base simulados para 2026
+    prices = {"BTC": 64200, "ETH": 3450, "SOL": 145, "USDT": 1.00, "MATIC": 0.85, "DOT": 7.20}
+    
     return [
-        {"coin": "BTC", "red": "Bitcoin Network", "fee_red": 0.0003, "exchanges": [
-            {"name": "Binance", "price": btc_price, "type": "COMPRA"},
-            {"name": "Kraken", "price": btc_price + 620, "type": "VENTA"}
-        ]},
-        {"coin": "ETH", "red": "Ethereum (ERC20)", "fee_red": 0.002, "exchanges": [
-            {"name": "Coinbase", "price": 3400, "type": "COMPRA"},
-            {"name": "Binance", "price": 3455, "type": "VENTA"}
-        ]},
-        {"coin": "SOL", "red": "Solana", "fee_red": 0.01, "exchanges": [
-            {"name": "Kraken", "price": 142.0, "type": "COMPRA"},
-            {"name": "Binance", "price": 147.5, "type": "VENTA"}
-        ]}
+        {"coin": "BTC", "red": "Bitcoin (Legacy)", "fee_usd": 15.00, "vel": "30-60 min", "diff": 580, "ex": ["Binance", "Kraken"]},
+        {"coin": "ETH", "red": "Ethereum (ERC20)", "fee_usd": 8.50, "vel": "5-12 min", "diff": 45, "ex": ["Coinbase", "Binance"]},
+        {"coin": "SOL", "red": "Solana (SPL)", "fee_usd": 0.01, "vel": "< 1 min", "diff": 3.20, "ex": ["Kraken", "Binance"]},
+        {"coin": "USDT", "red": "TRON (TRC20)", "fee_usd": 1.00, "vel": "2-5 min", "diff": 0.02, "ex": ["Bybit", "Binance"]},
+        {"coin": "MATIC", "red": "Polygon", "fee_usd": 0.05, "vel": "2-3 min", "diff": 0.12, "ex": ["OKX", "Coinbase"]},
+        {"coin": "DOT", "red": "Polkadot", "fee_usd": 0.25, "vel": "5 min", "diff": 0.40, "ex": ["Binance", "Kraken"]}
     ]

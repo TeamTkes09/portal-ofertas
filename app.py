@@ -1,75 +1,84 @@
 import streamlit as st
 import feedparser
-import time
+from deep_translator import GoogleTranslator
 
-# --- CONFIGURACIÓN DE ALTO NIVEL ---
-st.set_page_config(page_title="TechFlash | Ofertas al Instante", page_icon="⚡", layout="wide")
+# Configuración de la página Pro Global
+st.set_page_config(page_title="TechFlash Global ⚡", page_icon="🌐", layout="wide")
 
-# Diseño CSS para máxima velocidad y estética minimalista
+# Estilo CSS para que se vea premium
 st.markdown("""
     <style>
-    .main { background-color: #ffffff; }
-    .stButton>button {
-        background-color: #FF9900;
-        color: white;
-        border-radius: 8px;
-        border: none;
-        font-weight: bold;
-        transition: 0.3s;
-    }
-    .stButton>button:hover { background-color: #e68a00; transform: scale(1.02); }
-    .offer-card {
-        padding: 20px;
-        border: 1px solid #e6e9ef;
-        border-radius: 12px;
-        margin-bottom: 10px;
-    }
+    .main { background-color: #f8f9fa; }
+    .stButton>button { width: 100%; background-color: #FF9900; color: white; border-radius: 8px; font-weight: bold; }
+    .news-card { padding: 20px; border-radius: 15px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border-left: 5px solid #FF9900; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- MOTOR DE DATOS (Con Caché para ser veloz) ---
-@st.cache_data(ttl=600) # Guarda los datos 10 minutos para no recargar siempre
-def obtener_ofertas():
-    urls = [
-        "https://wwwhatsnew.com/feed",
-        "https://elandroidelibre.elespanol.com/feed",
-        "https://vandal.elespanol.com/tecnologia/rss"
-    ]
-    todas_las_ofertas = []
-    for url in urls:
-        feed = feedparser.parse(url)
-        todas_las_ofertas.extend(feed.entries[:5])
-    return todas_las_ofertas
+# --- BARRA LATERAL: CONFIGURACIÓN MUNDIAL ---
+with st.sidebar:
+    st.header("🌐 Configuración Global")
+    
+    # Selector de Idioma
+    idioma = st.selectbox("Selecciona tu idioma / Select Language", 
+                         ["Español", "English", "Português", "Français", "Deutsch"])
+    lang_code = {"Español": "es", "English": "en", "Português": "pt", "Français": "fr", "Deutsch": "de"}[idioma]
 
-# --- INTERFAZ ---
-st.title("⚡ TechFlash")
-st.caption("Las mejores ofertas y noticias de tecnología analizadas por IA en tiempo real.")
+    # Selector de Tienda Amazon (Aquí podés poner tus IDs de cada país)
+    pais = st.selectbox("Tienda Amazon / Amazon Store", ["Amazon USA (.com)", "Amazon España (.es)", "Amazon México (.com.mx)"])
+    amazon_suffix = {"Amazon USA (.com)": ".com", "Amazon España (.es)": ".es", "Amazon México (.com.mx)": ".com.mx"}[pais]
+    
+    # Tu ID de afiliado (Podes usar el mismo para empezar o diferentes si tenés)
+    afiliado_id = "unlimited0f3-20" 
 
-AMAZON_ID = "unlimited0f3-20"
+st.title("⚡ TechFlash Global News")
+st.subheader(f"Las mejores noticias y ofertas en {idioma}")
 
-# Sidebar para filtros rápidos
-st.sidebar.title("Filtros")
-categoria = st.sidebar.selectbox("Categoría", ["Todo", "Smartphones", "Gaming", "PC", "Hogar"])
+# --- FUNCIÓN DE TRADUCCIÓN Y NOTICIAS ---
+@st.cache_data(ttl=3600)
+def get_global_news(target_lang):
+    # Usamos el RSS de Google News Tech para tener variedad mundial
+    rss_url = f"https://news.google.com/rss/search?q=technology+deals&hl=en-US&gl=US&ceid=US:en"
+    feed = feedparser.parse(rss_url)
+    
+    translator = GoogleTranslator(source='auto', target=target_lang)
+    noticias = []
+    
+    for entry in feed.entries[:12]: # Tomamos las 12 más frescas
+        try:
+            titulo_traducido = translator.translate(entry.title)
+            # Limpiamos el título para la búsqueda en Amazon
+            busqueda_amazon = entry.title.split('-')[0].strip()
+            link_amazon = f"https://www.amazon{amazon_suffix}/s?k={busqueda_amazon}&tag={afiliado_id}"
+            
+            noticias.append({
+                "titulo": titulo_traducido,
+                "link_original": entry.link,
+                "link_amazon": link_amazon,
+                "fecha": entry.published
+            })
+        except:
+            continue
+    return noticias
 
-# Cuerpo principal
-noticias = obtener_ofertas()
+# --- MOSTRAR NOTICIAS EN GRILLA ---
+news = get_global_news(lang_code)
 
-# Sistema de columnas para que parezca una tienda moderna
-cols = st.columns(2)
+col1, col2 = st.columns(2)
 
-for i, nota in enumerate(noticias):
-    col = cols[i % 2] # Distribuye en 2 columnas
-    with col:
+for i, item in enumerate(news):
+    with (col1 if i % 2 == 0 else col2):
         st.markdown(f"""
-        <div class="offer-card">
-            <h3>{nota.title}</h3>
-            <p style="color: #666;">{nota.published if 'published' in nota else ''}</p>
+        <div class="news-card">
+            <h4>{item['titulo']}</h4>
+            <p style="font-size: 0.8rem; color: gray;">{item['fecha']}</p>
         </div>
         """, unsafe_allow_html=True)
         
-        link_final = f"{nota.link}?tag={AMAZON_ID}"
-        st.link_button(f"🛒 Ver en Amazon", link_final)
-        st.write("") # Espaciado
+        c1, c2 = st.columns(2)
+        with c1:
+            st.link_button("📰 Leer Noticia", item['link_original'])
+        with c2:
+            st.link_button("🛒 Ver Oferta Amazon", item['link_amazon'])
+        st.write("---")
 
-st.divider()
-st.caption("© 2026 TechFlash Argentina - Sistema de Arbitraje Automático.")
+st.caption("TechFlash Global © 2026 - Generando ingresos automáticos en todo el mundo.")

@@ -17,3 +17,4 @@ def render_legal_bunker(paypal_user):
     
     st.write("")
     st.link_button("☕ Apoyar Mantenimiento del Nodo (PayPal)", f"https://www.paypal.me/{paypal_user}", use_container_width=True)
+ target_col.markdown(html_card, unsafe_allow_html=True)

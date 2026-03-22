@@ -34,6 +34,8 @@ def render_hero(pais_nombre):
             <h1 style="font-size: 3rem; font-weight: 900; margin:0; color: white; letter-spacing: -1px;">
                 TECHFLASH <span style="color:#3b82f6;">PRO</span>
             </h1>
+             target_col.markdown(html_card, unsafe_allow_html=True)
+
             <p style="color: #94a3b8; font-size: 1rem; margin-top: 10px; font-weight: 400;">
                 Plataforma de Arbitraje y Análisis de Hardware
             </p>

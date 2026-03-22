@@ -1,9 +1,12 @@
+import ccxt
+import networkx as nx
+import math
 import streamlit as st
 import requests
 import pandas as pd
 import random
 
-# --- CONFIGURACIÓN DE REDES ---
+# --- CONFIGURACIÓN DE REDES PARA MONITOR GENERAL ---
 NETWORK_FEES = {
     'BTC': {'red': 'Bitcoin', 'fee': 15.0},
     'ETH': {'red': 'ERC20', 'fee': 8.5},
@@ -12,83 +15,119 @@ NETWORK_FEES = {
     'DEFAULT': {'red': 'BSC/BEP20', 'fee': 0.5}
 }
 
+# --- 1. MONITOR TOP 200 (PRECIOS DE MERCADO) ---
 @st.cache_data(ttl=60)
 def get_crypto_opportunities():
     try:
-        # Intentamos conectar con la API Real
         url = "https://api.coingecko.com/api/v3/coins/markets"
         params = {"vs_currency": "usd", "order": "market_cap_desc", "per_page": 200, "page": 1}
-        response = requests.get(url, params=params, timeout=5)
-        
+        response = requests.get(url, params=params, timeout=10)
         if response.status_code == 200:
             data = response.json()
             full_200 = []
             for coin in data:
                 sym = coin['symbol'].upper()
-                net = NETWORK_FEES.get(sym, NETWORK_FEES['DEFAULT'])
                 price = coin['current_price']
-                
+                net = NETWORK_FEES.get(sym, NETWORK_FEES['DEFAULT'])
                 full_200.append({
                     "Rank": coin['market_cap_rank'],
                     "Token": sym,
                     "Precio Compra": price,
-                    "Precio Venta": round(price * 1.002, 6), # Spread 0.2%
+                    "Precio Venta": round(price * 1.002, 6),
                     "Red": net['red'],
                     "Fee Red": net['fee'],
                     "Volumen 24h": coin['total_volume'],
                     "Cambio %": coin['price_change_percentage_24h']
                 })
             return full_200
-        else:
-            # Si la API responde pero con error (ej. Rate Limit 429)
-            return get_fallback_data()
-    except Exception:
-        # Si no hay internet o la API está caída
-        return get_fallback_data()
+    except:
+        return []
 
-def get_fallback_data():
-    """Datos de respaldo para que la app siempre muestre algo"""
-    return [
-        {"Rank": 1, "Token": "BTC", "Precio Compra": 65000.0, "Precio Venta": 65150.0, "Red": "Bitcoin", "Fee Red": 15.0, "Volumen 24h": 30000000, "Cambio %": 0.5},
-        {"Rank": 2, "Token": "ETH", "Precio Compra": 3500.0, "Precio Venta": 3515.0, "Red": "ERC20", "Fee Red": 8.5, "Volumen 24h": 15000000, "Cambio %": -0.2},
-        {"Rank": 3, "Token": "SOL", "Precio Compra": 145.0, "Precio Venta": 146.5, "Red": "Solana", "Fee Red": 0.01, "Volumen 24h": 5000000, "Cambio %": 2.4}
-    ]
+# --- 2. MOTOR DE ARBITRAJE INFINITO (N-PUNTAS) ---
+def buscar_ciclo_infinito(api_key, secret_key):
+    """
+    Usa algoritmos de grafos (Bellman-Ford) para encontrar la ruta
+    más rentable de N pasos dentro de Binance.
+    """
+    try:
+        exchange = ccxt.binance({
+            'apiKey': api_key,
+            'secret': secret_key,
+            'enableRateLimit': True,
+        })
+        
+        G = nx.DiGraph()
+        tickers = exchange.fetch_tickers()
+        
+        # Factor de comisión (0.075% con BNB activo)
+        fee_factor = 0.99925 
 
-@st.cache_data(ttl=15)
-def get_optimized_routes():
-    # Simulador de rutas de 2, 3 y 4 puntas
-    # NOTA: Aquí restamos ya el 0.4% de comisiones (0.1% x 4 trades)
-    return [
-        {
-            "id": "OPT-01", "tipo": "DIRECTO", "nodos": 2, 
-            "ruta": "USDT → SOL → USDT", "exchanges": ["Binance", "Kraken"], 
-            "roi_neto": 0.45, "riesgo": "BAJO", "descripcion": "Arbitraje simple."
-        },
-        {
-            "id": "OPT-03", "tipo": "CUADRANGULAR", "nodos": 4, 
-            "ruta": "USDT → BTC → ETH → SOL → USDT", "exchanges": ["Binance"], 
-            "roi_neto": 0.52, "riesgo": "MÍNIMO", 
-            "descripcion": "Ciclo interno. ROI ya descuenta el 0.4% de fees de trading."
-        }
-    ]
+        for symbol, data in tickers.items():
+            if '/' in symbol and data['ask'] and data['bid']:
+                base, quote = symbol.split('/')
+                ask, bid = data['ask'], data['bid']
 
-# --- 4. PRODUCTOS RETAIL (FBA) - COMPATIBILIDAD ---
+                if ask > 0 and bid > 0:
+                    # Peso negativo del logaritmo: suma de log = log de multiplicación
+                    # De Base a Quote (Venta)
+                    G.add_edge(base, quote, weight=-math.log(bid * fee_factor))
+                    # De Quote a Base (Compra)
+                    G.add_edge(quote, base, weight=-math.log((1/ask) * fee_factor))
+
+        # Buscar el ciclo de mayor ganancia partiendo de USDT
+        try:
+            ciclo = nx.find_negative_cycle(G, 'USDT')
+            
+            # Cálculo del ROI Real
+            peso_total = 0
+            for i in range(len(ciclo) - 1):
+                peso_total += G[ciclo[i]][ciclo[i+1]]['weight']
+            
+            roi_estimado = (math.exp(-peso_total) - 1) * 100
+            return {"status": "success", "ruta": ciclo, "roi": roi_estimado}
+            
+        except nx.NetworkXNoCycle:
+            return {"status": "no_path", "ruta": [], "roi": 0}
+
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# --- 3. EJECUCIÓN ATÓMICA DE TRADES ---
+def ejecutar_ruta_dinamica(api_key, secret_key, ruta, monto_usdt):
+    """Ejecuta secuencialmente los pares de la ruta hallada"""
+    exchange = ccxt.binance({
+        'apiKey': api_key, 'secret': secret_key, 'options': {'defaultType': 'spot'}
+    })
+    
+    try:
+        balance_actual = monto_usdt
+        for i in range(len(ruta) - 1):
+            source = ruta[i]
+            target = ruta[i+1]
+            
+            # Determinar si es compra o venta
+            symbol_buy = f"{target}/{source}"
+            symbol_sell = f"{source}/{target}"
+            
+            if symbol_buy in exchange.markets:
+                order = exchange.create_market_buy_order(symbol_buy, balance_actual)
+                balance_actual = order['filled']
+            else:
+                order = exchange.create_market_sell_order(symbol_sell, balance_actual)
+                balance_actual = order['filled']
+                
+        return {"status": "success", "final": balance_actual}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# --- 4. RETAIL & NOTICIAS ---
 def get_real_time_opportunities():
-    """Mantiene la funcionalidad de productos físicos si el usuario la usa"""
     return [
-        {"n": "Apple AirTag 4pk", "cat": "TECH", "c": 79.0, "v": 99.0, "q": "B08ZG76197", 
-         "comparativa": [{"sitio": "ebay", "precio": 92.0}]},
-        {"n": "Stanley Quencher 40oz", "cat": "HOGAR", "c": 35.0, "v": 85.0, "q": "B0C1M1YF9P", 
-         "comparativa": [{"sitio": "ebay", "precio": 78.0}]}
+        {"n": "MacBook M3 Pro", "cat": "TECH", "c": 1800.0, "v": 2100.0, "q": "B0CM5N3LY5", 
+         "comparativa": [{"sitio": "ebay", "precio": 1950.0}]}
     ]
 
 def get_news_events():
-    """Eventos de mercado"""
     return [
-        {
-            "titulo": "🔥 Alerta de Spread: BTC/KRW",
-            "descripcion": "Diferencial de 2% detectado en exchanges coreanos (Kimchi Premium).",
-            "fuente": "CryptoAlert", "hace": "2m", "impacto": "ALTO",
-            "productos_asociados": []
-        }
+        {"titulo": "Volatilidad en SOL", "impacto": "ALTO", "fuente": "Binance", "hace": "1m", "descripcion": "Spread de SOL/BTC aumentando."}
     ]

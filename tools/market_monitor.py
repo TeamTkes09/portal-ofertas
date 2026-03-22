@@ -2,44 +2,37 @@ import ccxt
 import pandas as pd
 import streamlit as st
 
-@st.cache_data(ttl=10) # Aumentamos a 10s para evitar saturar la API
+@st.cache_data(ttl=10)
 def get_binance_tickers():
     try:
-        # Configuración con Timeout y Proxy-friendly
         ex = ccxt.binance({
-            'timeout': 20000, # 20 segundos de espera
-            'enableRateLimit': True,
-            'options': {'defaultType': 'spot'}
+            'timeout': 15000, 
+            'enableRateLimit': True
         })
         
-        # Intentar obtener solo los tickers necesarios para no saturar
+        # 1. Obtenemos TODOS los tickers (Binance envía esto en un solo paquete JSON)
         tickers = ex.fetch_tickers()
         
-        if not tickers:
-            return None
-
         data = []
         for symbol, t in tickers.items():
-            if symbol.endswith('/USDT'):
-                # Validamos que existan los datos básicos
-                ask = t.get('ask') or t.get('last') or 0
-                bid = t.get('bid') or t.get('last') or 0
-                
+            # Filtramos solo pares contra USDT y que tengan datos válidos
+            if symbol.endswith('/USDT') and t.get('ask') and t.get('bid'):
                 data.append({
                     "Token": symbol.split('/')[0],
-                    "Precio Compra": ask,
-                    "Precio Venta": bid,
-                    "Spread %": round(((ask - bid) / ask * 100), 4) if ask > 0 else 0,
-                    "Volumen 24h": round(t.get('quoteVolume', 0), 2),
+                    "Precio Compra": t['ask'],
+                    "Precio Venta": t['bid'],
+                    "Spread %": round(((t['ask'] - t['bid']) / t['ask'] * 100), 4),
+                    "Volumen 24h": t.get('quoteVolume', 0),
                     "Cambio %": t.get('percentage', 0)
                 })
         
-        if not data:
-            return None
-
-        return pd.DataFrame(data).sort_values(by="Volumen 24h", ascending=False).head(50)
+        # 2. Convertimos a DataFrame y tomamos los TOP 500 por Volumen
+        df = pd.DataFrame(data)
+        if not df.empty:
+            df = df.sort_values(by="Volumen 24h", ascending=False).head(500)
+            return df
+        return None
 
     except Exception as e:
-        # Esto imprimirá el error real en tu consola de Streamlit
-        st.sidebar.error(f"Detalle técnico: {str(e)}")
+        st.error(f"Error de conexión: {e}")
         return None

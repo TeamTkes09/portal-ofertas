@@ -32,3 +32,14 @@ with tab_news:
 
 # 5. Renderizar Footer y Blindaje Legal Final
 footer.render_legal_bunker("TechFlash780")
+# En app.py
+from components import business_cards, business_table
+
+# Selector de modo de visualización
+vista = st.radio("Seleccionar visualización:", ["🎴 Tarjetas Visuales", "📑 Tabla de Datos (Excel)"], horizontal=True)
+
+if vista == "🎴 Tarjetas Visuales":
+    business_cards.render_investment_section(suffix)
+else:
+    # Pasamos la lista de oportunidades a la tabla
+    business_table.render_data_table(oportunidades, suffix)

@@ -4,124 +4,145 @@ from deep_translator import GoogleTranslator
 from pytrends.request import TrendReq
 import urllib.parse
 import random
-import requests  # Para la geolocalización
+import requests
+import time
 
-# 1. CONFIGURACIÓN DE PÁGINA
+# 1. CONFIGURACIÓN DE SEGURIDAD Y PÁGINA
 st.set_page_config(
-    page_title="TechFlash AI 🤖 Autodetect",
-    page_icon="📡",
+    page_title="TechFlash Viral 🚀 Global",
+    page_icon="📢",
     layout="wide"
 )
 
-# --- VERIFICACIÓN DE GOOGLE ---
-st.html('<meta name="google-site-verification" content="CkizRa_NBKko8N9KiS28aUkjKGkJbHlS3YI9htgLRRM" />')
+# --- CAPA DE SEGURIDAD Y ANTI-CLON ---
+st.html('''
+    <meta name="google-site-verification" content="CkizRa_NBKko8N9KiS28aUkjKGkJbHlS3YI9htgLRRM" />
+    <style>
+        body { -webkit-user-select: none; user-select: none; }
+        .share-btn { 
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 8px 12px; border-radius: 8px; color: white; 
+            text-decoration: none; font-size: 14px; font-weight: bold; margin-right: 5px;
+        }
+        .whatsapp { background-color: #25D366; }
+        .telegram { background-color: #0088cc; }
+        .twitter { background-color: #1DA1F2; }
+    </style>
+''')
 
-# 2. BASE DE DATOS DE PAÍSES
+# 2. SISTEMA DE ACCESO (PROTECCIÓN)
+if 'access_granted' not in st.session_state:
+    st.session_state.access_granted = False
+
+if not st.session_state.access_granted:
+    st.title("🛡️ Portal de Tendencias Seguras")
+    st.write("Verificando conexión segura... Haz clic para entrar.")
+    if st.button("🔓 Acceder ahora"):
+        st.session_state.access_granted = True
+        st.rerun()
+    st.stop()
+
+# 3. BASE DE DATOS DE PAÍSES
 PAISES_CONFIG = {
     "AR": {"name": "🇦🇷 Argentina", "pn": "argentina", "lang": "es", "amz": ".com.be"},
     "ES": {"name": "🇪🇸 España", "pn": "spain", "lang": "es", "amz": ".es"},
     "MX": {"name": "🇲🇽 México", "pn": "mexico", "lang": "es", "amz": ".com.mx"},
     "US": {"name": "🇺🇸 USA / Global", "pn": "united_states", "lang": "en", "amz": ".com"},
-    "BR": {"name": "🇧🇷 Brasil", "pn": "brazil", "lang": "pt", "amz": ".com.br"},
     "DEFAULT": {"name": "🇺🇸 Global", "pn": "united_states", "lang": "en", "amz": ".com"}
 }
 
-# 3. FUNCIÓN DE AUTODETECCIÓN (Mágica ✨)
-def detectar_usuario():
+# 4. AUTODETECCIÓN DE IP
+@st.cache_data(ttl=3600)
+def detectar_ip_segura():
     try:
-        # Consultamos la IP del visitante (Servicio gratuito ipapi)
-        response = requests.get('https://ipapi.co/json/', timeout=3).json()
-        pais_code = response.get('country_code', 'US')
-        idioma_pc = response.get('languages', 'en').split(',')[0][:2] # Ej: "es-AR" -> "es"
-        
-        # Si el país no está en nuestra lista, usamos Global
-        config_sugerida = PAISES_CONFIG.get(pais_code, PAISES_CONFIG["DEFAULT"])
-        return config_sugerida, idioma_pc
-    except:
-        return PAISES_CONFIG["DEFAULT"], "en"
+        res = requests.get('https://ipapi.co/json/', timeout=3).json()
+        return PAISES_CONFIG.get(res.get('country_code'), PAISES_CONFIG["DEFAULT"])
+    except: return PAISES_CONFIG["DEFAULT"]
 
-# Inicializar sesión para que no se resetee al navegar
-if 'user_config' not in st.session_state:
-    st.session_state.user_config, st.session_state.user_lang = detectar_usuario()
+if 'config' not in st.session_state:
+    st.session_state.config = detectar_ip_segura()
 
-# 4. SIDEBAR (Para cambios manuales)
+# 5. SIDEBAR
 with st.sidebar:
-    st.title("Ajustes Inteligentes ⚙️")
-    st.caption("Hemos detectado tu ubicación automáticamente, pero puedes cambiarla aquí:")
-    
-    # Buscamos el índice del país detectado para ponerlo por defecto
-    lista_nombres = [v["name"] for v in PAISES_CONFIG.values()]
-    try:
-        idx_defecto = lista_nombres.index(st.session_state.user_config["name"])
-    except:
-        idx_defecto = 3 # USA por defecto si falla
-        
-    nuevo_pais_nombre = st.selectbox("Tu Región:", lista_nombres, index=idx_defecto)
-    
-    # Actualizar config si el usuario cambia el selectbox
-    config = next(v for v in PAISES_CONFIG.values() if v["name"] == nuevo_pais_nombre)
-    
-    st.divider()
+    st.title("🚀 Viral Panel")
     modo = st.radio("Tema", ["Oscuro", "Claro"])
+    nombres = [v["name"] for v in PAISES_CONFIG.values()]
+    idx = nombres.index(st.session_state.config["name"]) if st.session_state.config["name"] in nombres else 0
+    seleccion = st.selectbox("Región:", nombres, index=idx)
+    st.session_state.config = next(v for v in PAISES_CONFIG.values() if v["name"] == seleccion)
+    st.divider()
+    st.write("📢 ¡Comparte la web para crecer!")
 
-# Colores
-bg = "#0e1117" if modo == "Oscuro" else "#ffffff"
-card = "#1d2129" if modo == "Oscuro" else "#f8f9fa"
-txt = "#e0e0e0" if modo == "Oscuro" else "#1a1a1a"
+# Colores dinámicos
+card_bg = "#1d2129" if modo == "Oscuro" else "#f8f9fa"
+txt_color = "#e0e0e0" if modo == "Oscuro" else "#1a1a1a"
 
-st.markdown(f"<style>.stApp {{ background-color: {bg}; color: {txt}; }} .trend-card {{ background: {card}; padding: 20px; border-radius: 15px; margin-bottom: 10px; border-left: 6px solid #FF9900; }}</style>", unsafe_allow_html=True)
-
-# 5. MOTOR DE DATOS (LOCALIZADO)
+# 6. MOTOR DE CONTENIDO (CON CACHE)
 @st.cache_data(ttl=900)
-def obtener_data(pn_code, lang, suffix):
+def get_viral_data(conf):
     try:
-        pytrends = TrendReq(hl=lang, tz=360)
-        trends = pytrends.trending_searches(pn=pn_code)[0].tolist()
-        
-        noticias_finales = []
-        translator = GoogleTranslator(source='auto', target=lang)
-        
-        for t in trends[:6]:
-            kw_enc = urllib.parse.quote(t)
-            rss = f"https://news.google.com/rss/search?q={kw_enc}+deals&hl={lang}&gl={pn_code.upper()}"
-            feed = feedparser.parse(rss)
-            if feed.entries:
-                entry = feed.entries[0]
-                titulo = translator.translate(entry.title.split(' - ')[0])
-                noticias_finales.append({
-                    "titulo": titulo, "url": entry.link, 
-                    "amz": f"https://www.amazon{suffix}/s?k={kw_enc}&tag=unlimited0f3-20",
+        pytrends = TrendReq(hl=conf['lang'], tz=360)
+        trends = pytrends.trending_searches(pn=conf['pn'])[0].tolist()[:6]
+    except: trends = ["Tecnología", "Gadgets", "Ofertas"]
+
+    results = []
+    translator = GoogleTranslator(source='auto', target=conf['lang'])
+    for t in trends:
+        kw_enc = urllib.parse.quote(t)
+        rss = f"https://news.google.com/rss/search?q={kw_enc}+deals&hl={conf['lang']}"
+        feed = feedparser.parse(rss)
+        if feed.entries:
+            try:
+                titulo = translator.translate(feed.entries[0].title.split(' - ')[0])
+                results.append({
+                    "titulo": titulo,
+                    "url": feed.entries[0].link,
+                    "amz": f"https://www.amazon{conf['amz']}/s?k={kw_enc}&tag=unlimited0f3-20",
                     "trend": t
                 })
-        return noticias_finales
-    except:
-        return []
+            except: continue
+    return results
 
-# 6. RENDERIZADO
-st.title("⚡ TechFlash AI")
-st.subheader(f"Bienvenido. Hemos configurado tu edición de {config['name']} 🌎")
+# 7. RENDERIZADO Y BOTONES VIRALES
+st.title("⚡ TechFlash Viral")
+st.caption(f"📍 Detectado en: {st.session_state.config['name']}")
 
-noticias = obtener_data(config['pn'], config['lang'], config['amz'])
+data = get_viral_data(st.session_state.config)
 
-if not noticias:
-    st.warning("Estamos actualizando las tendencias. Por favor, refresca en unos segundos.")
+for i, item in enumerate(data):
+    st.markdown(f"""
+    <div style="background:{card_bg}; padding:20px; border-radius:15px; border-left:6px solid #FF9900; margin-bottom:10px;">
+        <small style="color:#888;">🔥 Tendencia: {item['trend']}</small>
+        <h3 style="color:{txt_color};">{item['titulo']}</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Fila 1: Botones de Acción
+    c1, c2 = st.columns(2)
+    c1.link_button("📰 Leer Noticia", item['url'], use_container_width=True)
+    c2.link_button("🛒 Ver Oferta", item['amz'], use_container_width=True)
+    
+    # Fila 2: Botones de Compartir (Viralización)
+    st.write("📢 **Compartir esta oferta:**")
+    
+    # Preparar textos para compartir
+    texto_share = urllib.parse.quote(f"¡Mira esta oferta de {item['trend']} en TechFlash! ⚡\n\n{item['titulo']}\n\nVer aquí: ")
+    link_web = urllib.parse.quote("https://app-ofertas.streamlit.app/") # Cambia por tu link real
+    
+    share_col1, share_col2, share_col3, share_col4 = st.columns(4)
+    
+    with share_col1:
+        st.markdown(f'<a href="https://wa.me/?text={texto_share}{link_web}" target="_blank" class="share-btn whatsapp">WhatsApp</a>', unsafe_allow_html=True)
+    with share_col2:
+        st.markdown(f'<a href="https://t.me/share/url?url={link_web}&text={texto_share}" target="_blank" class="share-btn telegram">Telegram</a>', unsafe_allow_html=True)
+    with share_col3:
+        st.markdown(f'<a href="https://twitter.com/intent/tweet?text={texto_share}&url={link_web}" target="_blank" class="share-btn twitter">X (Twitter)</a>', unsafe_allow_html=True)
+    with share_col4:
+        # Copiar link (Botón nativo de Streamlit)
+        if st.button("🔗 Link", key=f"copy_{i}"):
+            st.toast("¡Enlace listo para compartir!")
+            st.code(f"https://app-ofertas.streamlit.app/")
 
-for i, n in enumerate(noticias):
-    with st.container():
-        st.markdown(f"""
-        <div class="trend-card">
-            <small>🔥 Tendencia en tu zona: {n['trend']}</small>
-            <h3>{n['titulo']}</h3>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        c1, c2 = st.columns(2)
-        c1.link_button("📰 Leer Noticia", n['url'], use_container_width=True)
-        c2.link_button("🛒 Oferta en Amazon", n['amz'], use_container_width=True)
-        
-        with st.expander("💬 Comunidad local"):
-            st.feedback("stars", key=f"s_{i}")
-            st.text_input("Deja un comentario:", key=f"t_{i}")
-        st.write("---")
+    st.write("---")
 
-st.caption(f"Detección automática activa. IP Localizada. Edición: {config['name']}")
+st.caption("Sistema Viral Activo. © 2026 TechFlash Security.")

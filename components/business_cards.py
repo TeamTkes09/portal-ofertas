@@ -8,13 +8,14 @@ def render_investment_section(suffix, lista_productos):
     cols = st.columns(4)
 
     for i, op in enumerate(lista_productos):
+        # Seleccionamos la columna usando el índice
         with cols[i % 4]:
             # Cálculos rápidos
             margen = op['v'] - op['c']
             roi = int((margen / op['c']) * 100)
             amz_url = f"https://www.amazon{suffix}/s?k={op['q']}&tag=tu-tag-20"
 
-            # TODO EL HTML VA DENTRO DE ESTA VARIABLE f-string
+            # Definimos el diseño HTML
             card_html = f"""
             <div style="
                 background-color: #1e293b; 
@@ -88,5 +89,5 @@ def render_investment_section(suffix, lista_productos):
                 </a>
             </div>
             """
-            # ESTA ES LA LÍNEA QUE TRANSFORMA EL TEXTO EN DISEÑO
+            # Renderizar el HTML
             st.markdown(card_html, unsafe_allow_html=True)

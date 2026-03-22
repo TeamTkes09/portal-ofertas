@@ -1,7 +1,7 @@
 # data/products.py
+
 def get_all_products():
     return [
-        # --- CATEGORÍA: HARDWARE (32 PRODUCTOS) ---
         {"id": "H01", "n": "NVIDIA RTX 5090 Founders", "c": 1999, "v": 2850, "r": "ALTO", "clr": "#ef4444", "q": "rtx 5090 founders edition", "cat": "💾 HARDWARE"},
         {"id": "H02", "n": "SSD Samsung 990 PRO 4TB", "c": 280, "v": 410, "r": "BAJO", "clr": "#22c55e", "q": "samsung 990 pro 4tb", "cat": "💾 HARDWARE"},
         {"id": "H03", "n": "Intel Core i9-14900KS", "c": 620, "v": 850, "r": "MEDIO", "clr": "#facc15", "q": "i9-14900ks processor", "cat": "💾 HARDWARE"},
@@ -11,7 +11,7 @@ def get_all_products():
         {"id": "H07", "n": "Seagate Exos 20TB NAS", "c": 310, "v": 495, "r": "BAJO", "clr": "#22c55e", "q": "seagate exos 20tb drive", "cat": "💾 HARDWARE"},
         {"id": "H08", "n": "Ryzen 9 7950X3D Bundle", "c": 550, "v": 790, "r": "MEDIO", "clr": "#facc15", "q": "ryzen 9 7950x3d combo", "cat": "💾 HARDWARE"},
         {"id": "H09", "n": "Lian Li O11 Dynamic EVO", "c": 140, "v": 210, "r": "BAJO", "clr": "#22c55e", "q": "lian li o11 dynamic evo", "cat": "💾 HARDWARE"},
-        {"id": "H10", "n": "Crucial T705 2TB Gen5 SSD", "c": 240, "at": "💾 HARDWARE", "v": 385, "r": "MEDIO", "clr": "#facc15", "q": "crucial t705 2tb ssd", "cat": "💾 HARDWARE"},
+        {"id": "H10", "n": "Crucial T705 2TB Gen5 SSD", "c": 240, "v": 385, "r": "MEDIO", "clr": "#facc15", "q": "crucial t705 2tb ssd", "cat": "💾 HARDWARE"},
         {"id": "H11", "n": "RTX 4080 Super Refurbished", "c": 820, "v": 1150, "r": "ALTO", "clr": "#ef4444", "q": "rtx 4080 super refurbished", "cat": "💾 HARDWARE"},
         {"id": "H12", "n": "Gigabyte Z790 AORUS Master", "c": 380, "v": 540, "r": "BAJO", "clr": "#22c55e", "q": "gigabyte z790 aorus master", "cat": "💾 HARDWARE"},
         {"id": "H13", "n": "Noctua NH-D15 chromax.black", "c": 115, "v": 165, "r": "BAJO", "clr": "#22c55e", "q": "noctua nh-d15 chromax black", "cat": "💾 HARDWARE"},
@@ -30,4 +30,8 @@ def get_all_products():
         {"id": "H26", "n": "Phanteks NV7 Case", "c": 210, "v": 299, "r": "MEDIO", "clr": "#facc15", "q": "phanteks nv7 chassis", "cat": "💾 HARDWARE"},
         {"id": "H27", "n": "Thermal Grizzly Kryonaut", "c": 25, "v": 45, "r": "BAJO", "clr": "#22c55e", "q": "thermal grizzly kryonaut extreme", "cat": "💾 HARDWARE"},
         {"id": "H28", "n": "EKWB AIO Elite 360mm", "c": 180, "v": 275, "r": "MEDIO", "clr": "#facc15", "q": "ekwb aio elite 360", "cat": "💾 HARDWARE"},
-        {"id": "H29", "n": "ASRock Taichi Radeon 7900", "c": 920, "v": 1250, "r": "ALTO", "clr": "#ef4444", "q": "asrock ta
+        {"id": "H29", "n": "ASRock Taichi Radeon 7900", "c": 920, "v": 1250, "r": "ALTO", "clr": "#ef4444", "q": "asrock taichi 7900 xtx", "cat": "💾 HARDWARE"},
+        {"id": "H30", "n": "TeamGroup T-Force Delta 32GB", "c": 105, "v": 165, "r": "BAJO", "clr": "#22c55e", "q": "teamgroup t-force delta ddr5", "cat": "💾 HARDWARE"},
+        {"id": "H31", "n": "Fractal Design North Case", "c": 130, "v": 210, "r": "BAJO", "clr": "#22c55e", "q": "fractal design north", "cat": "💾 HARDWARE"},
+        {"id": "H32", "n": "Lote Fan Pack x10 ARGB", "c": 85, "v": 195, "r": "ALTO", "clr": "#ef4444", "q": "argb case fan bulk 120mm", "cat": "💾 HARDWARE"}
+    ] # <--- Asegúrate de que este corchete cierre la lista

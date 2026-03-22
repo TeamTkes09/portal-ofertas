@@ -37,9 +37,22 @@ def render_investment_section(suffix, lista_productos):
                         <span style="color: #94a3b8; font-size: 10px; font-weight: bold;">ID: {op['id']}</span>
                     </div>
                     
-                    <h4 style="color: white; margin: 15px 0 10px 0; font-size: 14px; line-height: 1.4; font-weight: 600;">
-                        {op['n']}
-                    </h4>
+                    # Dentro de business_cards.py, busca esta parte:
+
+<h4 style="
+    color: white; 
+    margin: 15px 0 10px 0; 
+    font-size: 14px; 
+    line-height: 1.3; 
+    font-weight: 600;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 36px;
+">
+    {op['n']}
+</h4>
                     
                     <div style="background: #0f172a; border-radius: 8px; padding: 12px; margin: 10px 0; border: 1px solid #1e293b;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">

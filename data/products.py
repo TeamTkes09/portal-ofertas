@@ -1,37 +1,37 @@
 # data/products.py
 
 def get_all_products():
-    return [
-        {'id': 'C01', 'n': 'Samsung Galaxy S24 Ultra 512GB', 'cat': 'CELULARES', 'c': 1150, 'v': 1450, 'q': 'samsung galaxy s24 ultra', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 1290, 'url': '#'}, {'sitio': 'Local', 'precio': 1450, 'url': '#'}]},
-        {'id': 'C02', 'n': 'iPhone 15 Pro Max 256GB Renewed', 'cat': 'CELULARES', 'c': 940, 'v': 1180, 'q': 'iphone 15 pro max renewed', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'eBay', 'precio': 1050, 'url': '#'}, {'sitio': 'Local', 'precio': 1180, 'url': '#'}]},
-        {'id': 'C03', 'n': 'Google Pixel 8 Pro 128GB', 'cat': 'CELULARES', 'c': 749, 'v': 990, 'q': 'google pixel 8 pro', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 899, 'url': '#'}, {'sitio': 'Local', 'precio': 990, 'url': '#'}]},
-        {'id': 'C04', 'n': 'Xiaomi 14 Ultra Global', 'cat': 'CELULARES', 'c': 1100, 'v': 1550, 'q': 'xiaomi 14 ultra', 'clr': '#ef4444', 'r': 'ALTO', 'comparativa': [{'sitio': 'Ali', 'precio': 1300, 'url': '#'}, {'sitio': 'Local', 'precio': 1550, 'url': '#'}]},
-        {'id': 'C05', 'n': 'OnePlus 12 512GB Emerald', 'cat': 'CELULARES', 'c': 799, 'v': 1050, 'q': 'oneplus 12', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'BestBuy', 'precio': 899, 'url': '#'}, {'sitio': 'Local', 'precio': 1050, 'url': '#'}]},
-        {'id': 'C06', 'n': 'Nothing Phone (2) 256GB', 'cat': 'CELULARES', 'c': 590, 'v': 820, 'q': 'nothing phone 2', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'StockX', 'precio': 710, 'url': '#'}, {'sitio': 'Local', 'precio': 820, 'url': '#'}]},
-        {'id': 'C07', 'n': 'Motorola Edge 50 Pro', 'cat': 'CELULARES', 'c': 550, 'v': 780, 'q': 'motorola edge 50 pro', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 680, 'url': '#'}, {'sitio': 'Local', 'precio': 780, 'url': '#'}]},
-        {'id': 'C08', 'n': 'ASUS ROG Phone 8 Pro', 'cat': 'CELULARES', 'c': 1099, 'v': 1490, 'q': 'rog phone 8 pro', 'clr': '#ef4444', 'r': 'ALTO', 'comparativa': [{'sitio': 'Amazon', 'precio': 1250, 'url': '#'}, {'sitio': 'Local', 'precio': 1490, 'url': '#'}]},
-        {'id': 'C09', 'n': 'Sony Xperia 1 V 5G', 'cat': 'CELULARES', 'c': 980, 'v': 1350, 'q': 'sony xperia 1 v', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'BH', 'precio': 1150, 'url': '#'}, {'sitio': 'Local', 'precio': 1350, 'url': '#'}]},
-        {'id': 'C10', 'n': 'ZTE Nubia RedMagic 9 Pro', 'cat': 'CELULARES', 'c': 749, 'v': 1050, 'q': 'redmagic 9 pro', 'clr': '#ef4444', 'r': 'ALTO', 'comparativa': [{'sitio': 'Global', 'precio': 850, 'url': '#'}, {'sitio': 'Local', 'precio': 1050, 'url': '#'}]},
-        {'id': 'C11', 'n': 'Samsung Galaxy Z Fold 5', 'cat': 'CELULARES', 'c': 1400, 'v': 1850, 'q': 'galaxy fold 5', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'eBay', 'precio': 1600, 'url': '#'}, {'sitio': 'Local', 'precio': 1850, 'url': '#'}]},
-        {'id': 'C12', 'n': 'iPhone 14 Plus 128GB Renewed', 'cat': 'CELULARES', 'c': 580, 'v': 790, 'q': 'iphone 14 plus', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'BackMarket', 'precio': 680, 'url': '#'}, {'sitio': 'Local', 'precio': 790, 'url': '#'}]},
-        {'id': 'C13', 'n': 'Huawei P60 Pro Global', 'cat': 'CELULARES', 'c': 890, 'v': 1250, 'q': 'huawei p60 pro', 'clr': '#ef4444', 'r': 'ALTO', 'comparativa': [{'sitio': 'eBay', 'precio': 1050, 'url': '#'}, {'sitio': 'Local', 'precio': 1250, 'url': '#'}]},
-        {'id': 'C14', 'n': 'Poco F6 Pro 512GB', 'cat': 'CELULARES', 'c': 480, 'v': 690, 'q': 'poco f6 pro', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Ali', 'precio': 590, 'url': '#'}, {'sitio': 'Local', 'precio': 690, 'url': '#'}]},
-        {'id': 'C15', 'n': 'Honor Magic 6 Pro', 'cat': 'CELULARES', 'c': 950, 'v': 1320, 'q': 'honor magic 6 pro', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Google', 'precio': 1100, 'url': '#'}, {'sitio': 'Local', 'precio': 1320, 'url': '#'}]},
-        {'id': 'C16', 'n': 'Pixel 7a Unlocked', 'cat': 'CELULARES', 'c': 370, 'v': 540, 'q': 'pixel 7a', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Amazon', 'precio': 450, 'url': '#'}, {'sitio': 'Local', 'precio': 540, 'url': '#'}]},
-        {'id': 'H01', 'n': 'AMD Ryzen 9 7950X3D', 'cat': 'HARDWARE', 'c': 580, 'v': 740, 'q': 'ryzen 9 7950x3d', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Newegg', 'precio': 650, 'url': '#'}, {'sitio': 'Local', 'precio': 740, 'url': '#'}]},
-        {'id': 'H02', 'n': 'RTX 4080 Super ROG Strix', 'cat': 'HARDWARE', 'c': 1150, 'v': 1580, 'q': '4080 super strix', 'clr': '#ef4444', 'r': 'ALTO', 'comparativa': [{'sitio': 'BH', 'precio': 1300, 'url': '#'}, {'sitio': 'Local', 'precio': 1580, 'url': '#'}]},
-        {'id': 'H03', 'n': 'Samsung 990 Pro 2TB SSD', 'cat': 'HARDWARE', 'c': 170, 'v': 280, 'q': 'samsung 990 pro', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 220, 'url': '#'}, {'sitio': 'Local', 'precio': 280, 'url': '#'}]},
-        {'id': 'H04', 'n': 'G.Skill Trident Z5 64GB DDR5', 'cat': 'HARDWARE', 'c': 215, 'v': 320, 'q': 'gskill 64gb ddr5', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Newegg', 'precio': 270, 'url': '#'}, {'sitio': 'Local', 'precio': 320, 'url': '#'}]},
-        {'id': 'H05', 'n': 'Corsair RM1000e PSU', 'cat': 'HARDWARE', 'c': 160, 'v': 245, 'q': 'corsair rm1000e', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 195, 'url': '#'}, {'sitio': 'Local', 'precio': 245, 'url': '#'}]},
-        {'id': 'H06', 'n': 'Lote 10x Noctua Fans', 'cat': 'HARDWARE', 'c': 300, 'v': 450, 'q': 'noctua bulk', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'eBay', 'precio': 380, 'url': '#'}, {'sitio': 'Local', 'precio': 450, 'url': '#'}]},
-        {'id': 'H07', 'n': 'Lian Li O11 Dynamic EVO', 'cat': 'HARDWARE', 'c': 170, 'v': 290, 'q': 'lian li o11', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Newegg', 'precio': 220, 'url': '#'}, {'sitio': 'Local', 'precio': 290, 'url': '#'}]},
-        {'id': 'H08', 'n': 'Intel Core i9-14900K', 'cat': 'HARDWARE', 'c': 540, 'v': 710, 'q': 'i9-14900k', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Google', 'precio': 620, 'url': '#'}, {'sitio': 'Local', 'precio': 710, 'url': '#'}]},
-        {'id': 'H09', 'n': 'NZXT Kraken Elite 360', 'cat': 'HARDWARE', 'c': 280, 'v': 395, 'q': 'nzxt kraken 360', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'BH', 'precio': 320, 'url': '#'}, {'sitio': 'Local', 'precio': 395, 'url': '#'}]},
-        {'id': 'H10', 'n': 'WD Black 4TB SN850X', 'cat': 'HARDWARE', 'c': 290, 'v': 440, 'q': 'wd 4tb sn850x', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Google', 'precio': 360, 'url': '#'}, {'sitio': 'Local', 'precio': 440, 'url': '#'}]},
-        {'id': 'H11', 'n': 'ASUS ProArt Z790 Board', 'cat': 'HARDWARE', 'c': 450, 'v': 620, 'q': 'proart z790', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Newegg', 'precio': 520, 'url': '#'}, {'sitio': 'Local', 'precio': 620, 'url': '#'}]},
-        {'id': 'H12', 'n': 'Lote 3x RTX 3060 Renewed', 'cat': 'HARDWARE', 'c': 720, 'v': 1050, 'q': 'rtx 3060 bulk', 'clr': '#ef4444', 'r': 'ALTO', 'comparativa': [{'sitio': 'eBay', 'precio': 900, 'url': '#'}, {'sitio': 'Local', 'precio': 1050, 'url': '#'}]},
-        {'id': 'H13', 'n': 'Logitech G Pro Superlight 2', 'cat': 'HARDWARE', 'c': 140, 'v': 225, 'q': 'logitech g pro', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 180, 'url': '#'}, {'sitio': 'Local', 'precio': 225, 'url': '#'}]},
-        {'id': 'H14', 'n': 'Razer Huntsman V3 Pro', 'cat': 'HARDWARE', 'c': 220, 'v': 340, 'q': 'razer huntsman', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'BestBuy', 'precio': 280, 'url': '#'}, {'sitio': 'Local', 'precio': 340, 'url': '#'}]},
-        {'id': 'H15', 'n': 'Seagate IronWolf 12TB', 'cat': 'HARDWARE', 'c': 210, 'v': 350, 'q': 'seagate 12tb', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Newegg', 'precio': 280, 'url': '#'}, {'sitio': 'Local', 'precio': 350, 'url': '#'}]},
-        {'id': 'H16', 'n': 'Corsair Vengeance 32GB', 'cat': 'HARDWARE', 'c': 110, 'v': 185, 'q': 'vengeance ddr5', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 145, 'url': '#'}, {'sitio': 'Local', 'precio': 185, 'url': '#'}]}
+    products = []
+
+    # --- CATEGORÍA 1: ELECTRÓNICA (32 PRODUCTOS) ---
+    electronics = [
+        {'id': f'E{i:02d}', 'n': f'Gadget Tech Pro Mod-{i}', 'cat': 'ELECTRÓNICA', 'c': 100+i, 'v': 150+i, 'q': 'tech gadget', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'ebay', 'precio': 120+i}, {'sitio': 'google', 'precio': 130+i}, {'sitio': 'shopify', 'precio': 140+i}]}
+        for i in range(1, 33)
     ]
+    products.extend(electronics)
+
+    # --- CATEGORÍA 2: HOGAR Y COCINA (32 PRODUCTOS) ---
+    home_kitchen = [
+        {'id': f'H{i:02d}', 'n': f'Accesorio Hogar Premium {i}', 'cat': 'HOGAR', 'c': 50+i, 'v': 90+i, 'q': 'home decor', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'ebay', 'precio': 65+i}, {'sitio': 'google', 'precio': 75+i}, {'sitio': 'shopify', 'precio': 85+i}]}
+        for i in range(1, 33)
+    ]
+    products.extend(home_kitchen)
+
+    # --- CATEGORÍA 3: BELLEZA (32 PRODUCTOS) ---
+    beauty = [
+        {'id': f'B{i:02d}', 'n': f'Kit Belleza Profesional {i}', 'cat': 'BELLEZA', 'c': 30+i, 'v': 75+i, 'q': 'beauty kit', 'clr': '#ef4444', 'r': 'ALTO', 'comparativa': [{'sitio': 'ebay', 'precio': 45+i}, {'sitio': 'google', 'precio': 55+i}, {'sitio': 'shopify', 'precio': 65+i}]}
+        for i in range(1, 33)
+    ]
+    products.extend(beauty)
+
+    # --- CATEGORÍA 4: HERRAMIENTAS (32 PRODUCTOS) ---
+    tools = [
+        {'id': f'T{i:02d}', 'n': f'Herramienta Industrial {i}', 'cat': 'HERRAMIENTAS', 'c': 120+i, 'v': 210+i, 'q': 'power tools', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'ebay', 'precio': 150+i}, {'sitio': 'google', 'precio': 170+i}, {'sitio': 'shopify', 'precio': 190+i}]}
+        for i in range(1, 33)
+    ]
+    products.extend(tools)
+
+    # REPITIE ESTE BLOQUE PARA LAS OTRAS CATEGORÍAS:
+    # 5. Deportes, 6. Juguetes, 7. Oficina, 8. Bebé, 9. Automotriz, 10. Mascotas...
+
+    return products

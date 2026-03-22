@@ -1,46 +1,38 @@
 import streamlit as st
-from tools.market_monitor import get_binance_prices
-from tools.binance_engine import find_n_path_cycle, execute_trade_cycle
+from tools.market_monitor import get_binance_tickers
+from tools.binance_engine import buscar_n_puntas
 
-# Configuración de página (Esto debe ser lo primero)
-st.set_page_config(page_title="Crypto Radar Pro", layout="wide")
+st.set_page_config(page_title="Arbitraje Pro", layout="wide")
 
-# --- TÍTULO PRINCIPAL ---
-st.title("🚀 Portal de Arbitraje Inteligente")
-st.caption("Conexión directa con Binance API | Algoritmo N-Puntas")
+# Ocultar el menú lateral original para estética horizontal
+st.markdown("""<style>[data-testid="stSidebarNav"] {display: none;}</style>""", unsafe_allow_html=True)
 
-# --- NAVEGACIÓN HORIZONTAL ---
-# Aquí definimos las pestañas que antes estaban a la izquierda
-tab1, tab2, tab3 = st.tabs(["📊 Monitor de Mercado", "🕸️ Escáner N-Puntas", "📜 Historial de Trades"])
+st.title("🚀 Sistema de Arbitraje Dinámico")
+st.divider()
 
-# --- CONTENIDO DE LAS PESTAÑAS ---
+# --- PESTAÑAS HORIZONTALES ---
+tab1, tab2, tab3 = st.tabs(["📊 MONITOR DE MERCADO", "🕸️ ESCÁNER N-PUNTAS", "⚙️ CONFIGURACIÓN"])
 
 with tab1:
-    st.header("Precios en Tiempo Real (Binance)")
-    # Llamamos a la lógica que antes estaba en la página de Cripto
-    prices = get_binance_prices()
-    if prices:
-        st.dataframe(prices, use_container_width=True)
+    st.subheader("Precios Directos de Binance (USDT)")
+    df_precios = get_binance_tickers()
+    
+    if df_precios is not None:
+        st.dataframe(df_precios, use_container_width=True, hide_index=True)
+    else:
+        st.error("Error de conexión con Binance API. Verifica tu internet.")
 
 with tab2:
-    st.header("Buscador de Ciclos Infinitos")
-    col_api, col_exec = st.columns([1, 2])
-    
-    with col_api:
-        key = st.text_input("API Key", type="password")
-        secret = st.text_input("Secret Key", type="password")
-        monto = st.number_input("Inversión (USDT)", value=80.0)
-
-    if st.button("🔍 Escanear Grafo"):
-        with st.spinner("Buscando rutas rentables..."):
-            # Lógica del motor de grafos
-            res = find_n_path_cycle(key, secret)
-            st.write(res)
+    st.subheader("Buscador de Rutas de Ciclo Infinito")
+    if 'key' not in st.session_state or not st.session_state['key']:
+        st.warning("⚠️ Configura tus llaves API en la pestaña de Configuración.")
+    else:
+        if st.button("🔍 Iniciar Escaneo de Grafo"):
+            res = buscar_n_puntas(st.session_state['key'], st.session_state['secret'])
+            st.json(res)
 
 with tab3:
-    st.header("Registro de Operaciones")
-    # Aquí mostramos el log de auditoría
-    if 'audit_log' in st.session_state:
-        st.table(st.session_state['audit_log'])
-    else:
-        st.info("No hay operaciones registradas en esta sesión.")
+    st.subheader("Configuración de Seguridad")
+    st.session_state['key'] = st.text_input("Binance API Key", type="password")
+    st.session_state['secret'] = st.text_input("Binance Secret Key", type="password")
+    st.info("Las llaves se mantienen en la memoria de la sesión actual.")

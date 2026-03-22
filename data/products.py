@@ -1,8 +1,9 @@
 # data/products.py
 
 def get_all_products():
+    # La lista comienza con un corchete [
     return [
-        # --- CELULARES (16) ---
+        # --- CELULARES (16 PRODUCTOS) ---
         {'id': 'C01', 'n': 'Samsung Galaxy S24 Ultra 512GB', 'cat': 'CELULARES', 'c': 1150, 'v': 1450, 'q': 'samsung galaxy s24 ultra', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 1290, 'url': '#'}, {'sitio': 'Local', 'precio': 1450, 'url': '#'}]},
         {'id': 'C02', 'n': 'iPhone 15 Pro Max 256GB Renewed', 'cat': 'CELULARES', 'c': 940, 'v': 1180, 'q': 'iphone 15 pro max renewed', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'eBay', 'precio': 1050, 'url': '#'}, {'sitio': 'Local', 'precio': 1180, 'url': '#'}]},
         {'id': 'C03', 'n': 'Google Pixel 8 Pro 128GB', 'cat': 'CELULARES', 'c': 749, 'v': 990, 'q': 'google pixel 8 pro', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 899, 'url': '#'}, {'sitio': 'Local', 'precio': 990, 'url': '#'}]},
@@ -20,12 +21,10 @@ def get_all_products():
         {'id': 'C15', 'n': 'Honor Magic 6 Pro', 'cat': 'CELULARES', 'c': 950, 'v': 1320, 'q': 'honor magic 6 pro', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Google', 'precio': 1100, 'url': '#'}, {'sitio': 'Local', 'precio': 1320, 'url': '#'}]},
         {'id': 'C16', 'n': 'Pixel 7a Unlocked', 'cat': 'CELULARES', 'c': 370, 'v': 540, 'q': 'google pixel 7a', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Amazon', 'precio': 450, 'url': '#'}, {'sitio': 'Local', 'precio': 540, 'url': '#'}]},
         
-        # --- HARDWARE (16) ---
+        # --- HARDWARE (16 PRODUCTOS) ---
         {'id': 'H01', 'n': 'AMD Ryzen 9 7950X3D', 'cat': 'HARDWARE', 'c': 580, 'v': 740, 'q': 'ryzen 9 7950x3d', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Newegg', 'precio': 650, 'url': '#'}, {'sitio': 'Local', 'precio': 740, 'url': '#'}]},
         {'id': 'H02', 'n': 'RTX 4080 Super ROG Strix', 'cat': 'HARDWARE', 'c': 1150, 'v': 1580, 'q': 'rtx 4080 super rog strix', 'clr': '#ef4444', 'r': 'ALTO', 'comparativa': [{'sitio': 'B&H', 'precio': 1300, 'url': '#'}, {'sitio': 'Local', 'precio': 1580, 'url': '#'}]},
         {'id': 'H03', 'n': 'Samsung 990 Pro 2TB SSD', 'cat': 'HARDWARE', 'c': 170, 'v': 280, 'q': 'samsung 990 pro 2tb', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 220, 'url': '#'}, {'sitio': 'Local', 'precio': 280, 'url': '#'}]},
         {'id': 'H04', 'n': 'G.Skill Trident Z5 64GB DDR5', 'cat': 'HARDWARE', 'c': 215, 'v': 320, 'q': 'g.skill trident z5 64gb', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Newegg', 'precio': 270, 'url': '#'}, {'sitio': 'Local', 'precio': 320, 'url': '#'}]},
         {'id': 'H05', 'n': 'Corsair RM1000e PSU', 'cat': 'HARDWARE', 'c': 160, 'v': 245, 'q': 'corsair rm1000e', 'clr': '#22c55e', 'r': 'BAJO', 'comparativa': [{'sitio': 'Google', 'precio': 195, 'url': '#'}, {'sitio': 'Local', 'precio': 245, 'url': '#'}]},
-        {'id': 'H06', 'n': 'Lote 10x Noctua NF-A12 Fans', 'cat': 'HARDWARE', 'c': 300, 'v': 450, 'q': 'noctua nf-a12 bulk', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'eBay', 'precio': 380, 'url': '#'}, {'sitio': 'Local', 'precio': 450, 'url': '#'}]},
-        {'id': 'H07', 'n': 'Lian Li O11 Dynamic EVO', 'cat': 'HARDWARE', 'c': 170, 'v': 290, 'q': 'lian li o11 dynamic evo', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Newegg', 'precio': 220, 'url': '#'}, {'sitio': 'Local', 'precio': 290, 'url': '#'}]},
-        {'id': 'H08', 'n': 'Intel Core i9-14900K', 'cat': 'HARDWARE', 'c': 540, 'v': 710, 'q': 'i9-14900k', 'clr': '#facc15', 'r': 'MEDIO', 'comparativa': [{'sitio': 'Google', 'precio': 620, 'url': '#'}, {'sitio': 'Local', 'precio':
+        {'id': 'H06', 'n': 'Lote 10x Noctua NF-A12 Fans', 'cat': 'HARDWARE', 'c': 300, 'v': 450, 'q': 'noctua nf-a12 bulk', 'clr': '#facc15', 'r': 'MED

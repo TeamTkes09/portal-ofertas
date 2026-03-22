@@ -5,7 +5,6 @@ import pandas as pd
 def render_table_section(lista_productos):
     st.markdown("### 📊 Análisis de Activos (Vista Expandida)")
     
-    # Preparamos los datos para el DataFrame
     data_list = []
     for p in lista_productos:
         margen = p['v'] - p['c']
@@ -24,14 +23,13 @@ def render_table_section(lista_productos):
     
     df = pd.DataFrame(data_list)
     
-    # Renderizado de tabla interactiva
+    # ACTUALIZADO: Cambiamos use_container_width por width='stretch'
     st.dataframe(
         df, 
-        use_container_width=True, 
+        width='stretch', 
         hide_index=True,
         column_config={
             "ROI %": st.column_config.TextColumn("ROI %", help="Retorno de Inversión Estimado"),
             "Ganancia": st.column_config.TextColumn("Ganancia", help="Margen neto por unidad")
         }
     )
-    st.caption("💡 Tip: Haz clic en las cabeceras para ordenar por ROI o Ganancia.")

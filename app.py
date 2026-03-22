@@ -1,107 +1,88 @@
 import streamlit as st
-import pandas as pd
-import time
-from data.products import get_real_time_opportunities, get_news_events, get_crypto_opportunities
-from components.cards import render_investment_section, render_crypto_section
+import random
 
-# 1. CONFIGURACIÓN DE PÁGINA
-st.set_page_config(
-    page_title="Arbitraje 360 Pro - v2026",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# --- 🛡️ BLINDAJE DE RESPONSABILIDAD (DIÁLOGO OBLIGATORIO) ---
-if 'legal_accepted' not in st.session_state:
-    @st.dialog("⚖️ Términos y Blindaje de Responsabilidad")
-    def show_legal():
-        st.error("AVISO CRÍTICO PARA EL OPERADOR")
-        st.write("""
-        Esta herramienta proporciona datos estimados basados en APIs de terceros. 
-        - **Volatilidad:** Los precios pueden cambiar en segundos.
-        - **Responsabilidad:** No nos hacemos responsables por pérdidas de capital o bloqueos de cuenta (Gating).
-        - **Costos:** Los márgenes mostrados son brutos; use el calculador lateral para netos.
-        """)
-        if st.button("He leído y acepto los riesgos de mercado"):
-            st.session_state.legal_accepted = True
-            st.rerun()
-    show_legal()
-
-# --- 🎨 ESTILOS PERSONALIZADOS ---
-st.markdown("""
-    <style>
-    .block-container { padding: 1rem 2rem; }
-    .news-box { background: #1e293b; padding: 15px; border-radius: 10px; border-left: 5px solid #22c55e; margin-bottom: 20px; }
-    .stTabs [data-baseweb="tab-list"] { gap: 10px; }
-    .stTabs [data-baseweb="tab"] { font-weight: bold; border-radius: 5px; }
-    </style>
-""", unsafe_allow_html=True)
-
-# --- ⚙️ SIDEBAR: CONFIGURACIÓN Y CALCULADORA ---
-with st.sidebar:
-    st.title("⚙️ Operaciones")
+# --- 1. PRODUCTOS FÍSICOS (REFRESCO 15 MIN) ---
+@st.cache_data(ttl=900)
+def get_real_time_opportunities():
+    # Base de datos real
+    catalogo = [
+        {"n": "Apple AirTag (4 Pack)", "cat": "TECH", "c_base": 78, "v_base": 99, "q": "B08ZG76197"},
+        {"n": "Stanley Quencher 40oz", "cat": "HOGAR", "c_base": 35, "v_base": 85, "q": "B0C1M1YF9P"},
+        {"n": "Sony WH-1000XM5", "cat": "TECH", "c_base": 285, "v_base": 399, "q": "B09XS7JWHH"},
+        {"n": "LEGO Star Wars Ghost", "cat": "JUGUETES", "c_base": 128, "v_base": 159, "q": "B0BXQ4B5RL"},
+        {"n": "Ninja Creami Deluxe", "cat": "HOGAR", "c_base": 165, "v_base": 249, "q": "B0B94Z9V9B"},
+        {"n": "Logitech MX Master 3S", "cat": "TECH", "c_base": 82, "v_base": 109, "q": "B09HM94VDS"},
+        {"n": "Olaplex No. 3", "cat": "BELLEZA", "c_base": 19, "v_base": 30, "q": "B0086OT8S2"},
+        {"n": "DJI Mini 4 Pro", "cat": "TECH", "c_base": 890, "v_base": 1099, "q": "B0CHMS6S46"}
+    ]
     
-    # Selección de País y Lenguaje
-    col_l, col_p = st.columns(2)
-    with col_l:
-        idioma = st.selectbox("Idioma", ["ES", "EN"])
-    with col_p:
-        pais = st.selectbox("Mercado", [".com", ".es", ".mx", ".co"])
-    
-    st.divider()
-    
-    # CALCULADOR DE COSTO ESTIMADO (Arbitraje Entero)
-    st.subheader("🧮 Calculador de Costos")
-    costo_compra = st.number_input("Precio Compra ($)", min_value=0.0, value=100.0)
-    
-    with st.expander("Detalle de Gastos FBA/Prep", expanded=False):
-        tax = st.slider("Sales Tax / IVA (%)", 0, 21, 7)
-        prep = st.number_input("Prep Center (Etiqueta/Bolsa)", value=1.50)
-        envio_fba = st.number_input("Envío a Amazon (Inbound)", value=0.80)
-        comision_amz = st.slider("Comisión Amazon (%)", 8, 15, 15)
-        fba_fee = st.number_input("Tarifa Logística (Fulfillment)", value=5.50)
+    productos = []
+    for i in range(32):
+        base = catalogo[i % len(catalogo)]
+        variacion = random.uniform(0.97, 1.03)
+        costo = round(base['c_base'] * variacion, 2)
+        venta = round(base['v_base'], 2)
+        
+        productos.append({
+            'id': f"SKU-{i+100}",
+            'n': f"{base['n']} #{i+1}",
+            'cat': base['cat'],
+            'c': costo,
+            'v': venta,
+            'q': base['q'],
+            'r': "BAJO" if (venta-costo)/costo > 0.3 else "MEDIO",
+            'comparativa': [
+                {'sitio': 'ebay', 'precio': round(venta * 0.92, 2)},
+                {'sitio': 'google', 'precio': round(venta * 0.96, 2)},
+                {'sitio': 'shopify', 'precio': round(venta * 1.03, 2)}
+            ]
+        })
+    return productos
 
-    # Cálculo Final
-    total_gastos = (costo_compra * (tax/100)) + prep + envio_fba + fba_fee + (costo_compra * (comision_amz/100))
-    costo_total_operativo = costo_compra + total_gastos
-    
-    st.metric("Inversión Total Estimada", f"${costo_total_operativo:.2f}")
-    st.caption("Incluye compra, logística y fees de venta.")
-    
-    st.divider()
-    st.info(f"⏱️ Próximo refresco: {15 - ((int(time.time()) // 60) % 15)} min")
+# --- 2. NOTICIAS + PRODUCTOS ---
+def get_news_events():
+    return [
+        {
+            "titulo": "🔥 Viral TikTok: Stanley 'Azure' Agotado",
+            "descripcion": "Ruptura de stock en tiendas físicas. Los precios en Amazon suben por demanda masiva.",
+            "fuente": "MarketPulse",
+            "hace": "12 min",
+            "impacto": "ALTO",
+            "productos_asociados": [
+                {'id': 'N01', 'n': 'Stanley 40oz Azure', 'cat': 'HOGAR', 'c': 45.0, 'v': 95.0, 'q': 'B0C1M1YF9P', 'r': 'BAJO', 'comparativa': [{'sitio': 'ebay', 'precio': 85}, {'sitio': 'google', 'precio': 88}, {'sitio': 'shopify', 'precio': 92}]}
+            ]
+        },
+        {
+            "titulo": "📦 Escasez: SSD Samsung T7",
+            "descripcion": "Falla en planta de memorias reduce stock. Precios suben un 12% en las últimas horas.",
+            "fuente": "TechSupply",
+            "hace": "35 min",
+            "impacto": "CRÍTICO",
+            "productos_asociados": [
+                {'id': 'N02', 'n': 'Samsung T7 2TB', 'cat': 'TECH', 'c': 145.0, 'v': 199.0, 'q': 'B09VLK9W3S', 'r': 'MEDIO', 'comparativa': [{'sitio': 'ebay', 'precio': 175}, {'sitio': 'google', 'precio': 180}, {'sitio': 'shopify', 'precio': 190}]}
+            ]
+        }
+    ]
 
-# --- 🚀 CUERPO PRINCIPAL ---
-st.title("🚀 Centro de Mando de Arbitraje")
-st.caption(f"Sincronizado con APIs de Amazon, Keepa y Exchanges • {time.strftime('%d/%m/%Y %H:%M')}")
-
-# PESTAÑAS
-tab_news, tab_prod, tab_crypto = st.tabs([
-    "📰 Noticias y Eventos", 
-    "📦 Catálogo General (FBA)", 
-    "₿ Arbitraje Crypto (Exchanges)"
-])
-
-# --- PESTAÑA 1: NOTICIAS OPERATIVAS ---
-with tab_news:
-    st.subheader("🔥 Oportunidades por Eventos de Mercado")
-    noticias_eventos = get_news_events() # Carga noticias vinculadas a productos
-    
-    for ev in noticias_eventos:
-        col_n, col_p = st.columns([1, 2])
-        with col_n:
-            st.markdown(f"""
-                <div class="news-box">
-                    <small style="color:#94a3b8;">{ev['fuente']} • Hace {ev['hace']}</small>
-                    <h4 style="margin:5px 0;">{ev['titulo']}</h4>
-                    <p style="font-size:0.85rem;">{ev['descripcion']}</p>
-                    <span style="background:#064e3b; color:#4ade80; padding:2px 8px; border-radius:10px; font-size:0.7rem;">
-                        Impacto: {ev['impacto']}
-                    </span>
-                </div>
-            """, unsafe_allow_html=True)
-        with col_p:
-            render_investment_section(pais, ev['productos_asociados'])
-        st.divider()
-
-# --- PESTAÑA 2: PRODUCTOS FÍSICOS (CATÁLOGO)
+# --- 3. CRYPTO (REFRESCO 5 MIN) ---
+@st.cache_data(ttl=300)
+def get_crypto_opportunities():
+    btc = 64200 + random.randint(-50, 50)
+    return [
+        {
+            "coin": "BTC", "gap": 485, "roi": 0.75,
+            "exchanges": [
+                {"name": "Binance", "price": btc, "type": "COMPRA"},
+                {"name": "Kraken", "price": btc + 485, "type": "VENTA"},
+                {"name": "Coinbase", "price": btc + 210, "type": "NEUTRAL"}
+            ]
+        },
+        {
+            "coin": "ETH", "gap": 52, "roi": 1.51,
+            "exchanges": [
+                {"name": "Coinbase", "price": 3420, "type": "COMPRA"},
+                {"name": "Binance", "price": 3472, "type": "VENTA"},
+                {"name": "Kraken", "price": 3450, "type": "NEUTRAL"}
+            ]
+        }
+    ]

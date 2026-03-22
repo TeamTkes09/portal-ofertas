@@ -5,127 +5,116 @@ from pytrends.request import TrendReq
 import pandas as pd
 import urllib.parse
 
-# 1. CONFIGURACIÓN ESTRATÉGICA (SEO Y DISEÑO)
+# 1. CONFIGURACIÓN DE PÁGINA Y SEO
 st.set_page_config(
-    page_title="LIVE Tech Trends ⚡ Ofertas Globales",
-    page_icon="🔥",
+    page_title="TechFlash Global ⚡ Tendencias",
+    page_icon="🚀",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# --- VERIFICACIÓN DE PROPIEDAD DE GOOGLE (Inyectada en el Head) ---
-st.markdown(f'''
-    <script>
-        var meta = document.createElement('meta');
-        meta.name = "google-site-verification";
-        meta.content = "CkizRa_NBKko8N9KiS28aUkjKGkJbHlS3YI9htgLRRM";
-        document.getElementsByTagName('head')[0].appendChild(meta);
-    </script>
-    ''', unsafe_allow_html=True)
+# --- VERIFICACIÓN DE GOOGLE (No tocar) ---
+st.html('<meta name="google-site-verification" content="CkizRa_NBKko8N9KiS28aUkjKGkJbHlS3YI9htgLRRM" />')
 
-# Estilos CSS Premium para Amazon/Tech
-st.markdown("""
+# 2. SELECTOR DE MODO (Día/Noche) Y CONFIGURACIÓN MUNDIAL EN SIDEBAR
+with st.sidebar:
+    st.title("Settings ⚙️")
+    modo = st.radio("Modo de Visibilidad", ["☀️ Claro", "🌙 Oscuro"])
+    
+    st.divider()
+    idioma_nombre = st.selectbox("Idioma / Language", ["Español", "English", "Português", "Français", "Deutsch"])
+    pais = st.selectbox("Tienda Amazon", ["USA (.com)", "España (.es)", "México (.com.mx)", "UK (.co.uk)"])
+    
+    lang_map = {"Español": "es", "English": "en", "Português": "pt", "Français": "fr", "Deutsch": "de"}
+    suffix_map = {"USA (.com)": ".com", "España (.es)": ".es", "México (.com.mx)": ".com.mx", "UK (.co.uk)": ".co.uk"}
+    
+    lang_code = lang_map[idioma_nombre]
+    amazon_suffix = suffix_map[pais]
+    afiliado_id = "unlimited0f3-20"
+
+# 3. ESTILOS ADAPTATIVOS (PC Y MÓVIL) + MODO OSCURO
+bg_color = "#ffffff" if modo == "☀️ Claro" else "#0e1117"
+card_bg = "#f8f9fa" if modo == "☀️ Claro" else "#1d2129"
+text_color = "#1a1a1a" if modo == "☀️ Claro" else "#e0e0e0"
+
+st.markdown(f"""
     <style>
-    .main { background-color: #f0f2f6; }
-    .stButton>button { width: 100%; background-color: #FF9900; color: white; border: none; border-radius: 5px; font-weight: bold; height: 45px; }
-    .stButton>button:hover { background-color: #e68a00; color: white; }
-    .trend-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; border-top: 5px solid #ff4b4b; }
-    .badge { background-color: #ff4b4b; color: white; padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-    h3 { color: #1a1a1a; font-family: 'Helvetica', sans-serif; }
+    .stApp {{ background-color: {bg_color}; color: {text_color}; }}
+    
+    /* Estilo de Tarjetas Adaptativas */
+    .trend-card {{
+        background: {card_bg};
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border-left: 6px solid #FF9900;
+        transition: transform 0.2s;
+    }}
+    
+    /* Optimización para Celulares */
+    @media (max-width: 640px) {{
+        .trend-card {{ padding: 10px; margin-bottom: 15px; }}
+        h3 {{ font-size: 1.1rem !important; }}
+        .stButton>button {{ height: 50px !important; font-size: 16px !important; }}
+    }}
+
+    .badge {{ background-color: #ff4b4b; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }}
+    h3 {{ color: {text_color}; }}
     </style>
 """, unsafe_allow_html=True)
 
-# 2. BARRA LATERAL: CONFIGURACIÓN MUNDIAL
-with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/3858/3858693.png", width=80)
-    st.header("🌐 Configuración Global")
-    
-    # Idioma del contenido
-    idioma_nombre = st.selectbox("Idioma / Language", ["Español", "English", "Português", "Français", "Deutsch"])
-    lang_map = {"Español": "es", "English": "en", "Português": "pt", "Français": "fr", "Deutsch": "de"}
-    lang_code = lang_map[idioma_nombre]
-
-    # Tienda de Amazon según país
-    pais = st.selectbox("Tienda Amazon", ["USA (.com)", "España (.es)", "México (.com.mx)", "UK (.co.uk)"])
-    suffix_map = {"USA (.com)": ".com", "España (.es)": ".es", "México (.com.mx)": ".com.mx", "UK (.co.uk)": ".co.uk"}
-    amazon_suffix = suffix_map[pais]
-    
-    # Tu ID de Afiliado
-    afiliado_id = "unlimited0f3-20"
-    
-    st.divider()
-    st.info("Esta web detecta tendencias en tiempo real para generar ofertas automáticas.")
-
-# 3. MOTORES DE BÚSQUEDA (TENDENCIAS Y NOTICIAS)
-@st.cache_data(ttl=600) # Se actualiza cada 10 minutos
-def obtener_tendencias_vivas():
+# 4. FUNCIONES DE DATOS
+@st.cache_data(ttl=600)
+def obtener_tendencias():
     try:
         pytrends = TrendReq(hl='en-US', tz=360)
-        # Obtenemos tendencias de búsqueda de EE.UU.
         df = pytrends.trending_searches(pn='united_states')
         return df[0].tolist()
     except:
-        # Fallback si Google Trends está saturado
-        return ["iPhone 17", "Nvidia Blackwell", "PlayStation 6", "Amazon Prime Deals", "Smart Home Tech"]
+        return ["AI Tech", "Smartphones 2026", "Gaming Gear", "Home Automation"]
 
-def buscar_noticias_y_ofertas(keyword, target_lang):
-    # Limpiamos la keyword para evitar errores de URL (InvalidURL)
+def buscar_noticias(keyword, target_lang):
     keyword_encoded = urllib.parse.quote(keyword)
-    
     translator = GoogleTranslator(source='auto', target=target_lang)
-    # Buscamos en Google News la tendencia + tech deals
-    rss_url = f"https://news.google.com/rss/search?q={keyword_encoded}+technology+deals&hl=en-US&gl=US&ceid=US:en"
+    rss_url = f"https://news.google.com/rss/search?q={keyword_encoded}+tech+deals&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(rss_url)
     
     items = []
-    for entry in feed.entries[:2]: # 2 noticias por tendencia
+    for entry in feed.entries[:2]:
         try:
-            titulo_original = entry.title.split(' - ')[0]
-            titulo_traducido = translator.translate(titulo_original)
-            
-            # Link de Amazon optimizado y codificado
-            link_amazon = f"https://www.amazon{amazon_suffix}/s?k={keyword_encoded}&tag={afiliado_id}"
-            
-            items.append({
-                "titulo": titulo_traducido,
-                "link_noticia": entry.link,
-                "link_amazon": link_amazon,
-                "keyword": keyword
-            })
-        except:
-            continue
+            titulo = translator.translate(entry.title.split(' - ')[0])
+            link_amz = f"https://www.amazon{amazon_suffix}/s?k={keyword_encoded}&tag={afiliado_id}"
+            items.append({"titulo": titulo, "url": entry.link, "amazon": link_amz, "trend": keyword})
+        except: continue
     return items
 
-# 4. CUERPO PRINCIPAL DE LA WEB
-st.title("🚀 TechFlash: Tendencias al Segundo")
-st.markdown(f"Mostrando resultados para: **{pais}** en **{idioma_nombre}**")
+# 5. RENDERIZADO DE LA WEB
+st.title("⚡ TechFlash Global")
+st.write(f"🌍 **Región:** {pais} | 🗣️ **Idioma:** {idioma_nombre}")
 
-# Capturar tendencias del momento
-tendencias = obtener_tendencias_vivas()
+tendencias = obtener_tendencias()
 
-# Layout de 2 columnas para noticias
-col1, col2 = st.columns(2)
-
-# Procesar las tendencias
-for index, trend in enumerate(tendencias[:10]): # Analizamos las 10 principales
-    noticias_trend = buscar_noticias_y_ofertas(trend, lang_code)
+# Usamos contenedores para que Streamlit maneje el responsive automáticamente
+for index, trend in enumerate(tendencias[:12]):
+    noticias = buscar_noticias(trend, lang_code)
     
-    with (col1 if index % 2 == 0 else col2):
-        for noticia in noticias_trend:
+    for noticia in noticias:
+        with st.container():
             st.markdown(f"""
             <div class="trend-card">
-                <span class="badge">Trending Now: {trend}</span>
-                <h3 style="margin-top:10px;">{noticia['titulo']}</h3>
-                <p style="color: #555; font-size: 0.9em;">Detectado en buscadores globales hace instantes.</p>
+                <span class="badge">🔥 TOP TREND: {noticia['trend']}</span>
+                <h3>{noticia['titulo']}</h3>
             </div>
             """, unsafe_allow_html=True)
             
-            # Botones de acción
-            btn_noticia, btn_amazon = st.columns(2)
-            btn_noticia.link_button("📰 Ver Detalles", noticia['link_noticia'])
-            btn_amazon.link_button("🛒 Ver en Amazon", noticia['link_amazon'])
+            # Botones en formato 1 columna para móvil y 2 para PC
+            col_btn1, col_btn2 = st.columns([1, 1])
+            with col_btn1:
+                st.link_button("📖 Leer Noticia", noticia['url'])
+            with col_btn2:
+                st.link_button("🛒 Ver Oferta", noticia['amazon'])
             st.write("")
 
-# Pie de página SEO
 st.divider()
-st.caption(f"© 2026 TechFlash Global. Optimizada para indexación instantánea en Google. Tienda: {pais}.")
+st.caption("Optimizada para dispositivos móviles y escritorio. © 2026 TechFlash.")

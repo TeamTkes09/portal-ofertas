@@ -1,157 +1,95 @@
 import streamlit as st
 import feedparser
 from deep_translator import GoogleTranslator
-from pytrends.request import TrendReq
 import urllib.parse
-import random
 import requests
-import time
 
-# --- CONFIGURACIÓN DE SEGURIDAD Y UI ---
-st.set_page_config(page_title="TechFlash Pay 🔐 TechFlash780", page_icon="💳", layout="wide")
+# 1. CONFIGURACIÓN DE MONETIZACIÓN
+st.set_page_config(page_title="TechFlash Ads & Shop 💸", page_icon="📈", layout="wide")
 
-# --- CONFIGURACIÓN DE SOCIO PAYPAL ---
-MI_PAYPAL_USER = "TechFlash780"  
-# -------------------------------------------
+# --- TUS CREDENCIALES (DINERO) ---
+MI_PAYPAL_USER = "TechFlash780"
+AMZ_TAG = "unlimited0f3-20"  # Asegúrate de que este sea tu ID de Amazon Afiliados
+GOOGLE_ADS_ID = "ca-pub-XXXXXXXXXXXXXXXX" # Aquí iría tu ID de Google Adsense
 
-st.html('''
+# --- CSS: DISEÑO ORIENTADO A CLICS ---
+st.html(f'''
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        .stApp { background: #0d1117; color: #c9d1d9; font-family: 'Inter', sans-serif; }
-        
-        /* Contenedor de Donación */
-        .pay-header {
-            background: linear-gradient(135deg, #003087 0%, #0070ba 100%);
-            padding: 30px;
-            border-radius: 20px;
+        .stApp {{ background: #0a0a0a; color: #e5e7eb; }}
+        .ad-space {{
+            background: #1a1a1a;
+            border: 1px dashed #444;
+            color: #888;
+            padding: 10px;
             text-align: center;
-            margin-bottom: 30px;
-            border: 1px solid #58a6ff;
-            box-shadow: 0 10px 30px rgba(0,112,186,0.2);
-        }
-
-        /* Tarjetas de Tendencias Premium */
-        .secure-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            padding: 25px;
-            border-radius: 18px;
-            margin-bottom: 20px;
-            transition: 0.3s ease;
-        }
-        .secure-card:hover { border-color: #0070ba; transform: translateY(-3px); }
-
-        /* Barra de Progreso de Meta */
-        .goal-bar {
-            background: #30363d;
-            border-radius: 10px;
-            height: 12px;
-            width: 100%;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-        .goal-fill {
-            background: #25D366;
-            height: 100%;
-            width: 65%; /* Simulación de meta al 65% */
-        }
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 12px;
+        }}
+        .product-box {{
+            background: #111827;
+            border: 1px solid #374151;
+            padding: 20px;
+            border-radius: 15px;
+            transition: 0.3s;
+        }}
+        .product-box:hover {{ border-color: #10b981; transform: translateY(-3px); }}
+        .btn-amazon {{
+            background: #ff9900;
+            color: black !important;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 8px;
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+        }}
     </style>
 ''')
 
-# 1. ACCESO SEGURO
-if 'auth' not in st.session_state:
-    st.session_state.auth = False
+# 2. ESPACIO PARA PUBLICIDAD SUPERIOR (Google Ads)
+st.markdown('<div class="ad-space">ESPACIO PUBLICITARIO (Google Adsense Banner)</div>', unsafe_allow_html=True)
+# Nota: Aquí insertarías el script de Google Adsense real
 
-if not st.session_state.auth:
-    st.title("🛡️ TechFlash Security")
-    st.info("Verificando credenciales de cifrado para TechFlash780...")
-    if st.button("🔓 ENTRAR AL PORTAL SEGURO"):
-        st.session_state.auth = True
-        st.rerun()
-    st.stop()
-
-# 2. DETECCIÓN DE UBICACIÓN
-PAISES = {
-    "AR": {"name": "Argentina 🇦🇷", "pn": "argentina", "lang": "es", "amz": ".com.be"},
-    "ES": {"name": "España 🇪🇸", "pn": "spain", "lang": "es", "amz": ".es"},
-    "MX": {"name": "México 🇲🇽", "pn": "mexico", "lang": "es", "amz": ".com.mx"},
-    "US": {"name": "USA / Global 🇺🇸", "pn": "united_states", "lang": "en", "amz": ".com"},
-    "DEFAULT": {"name": "Global 🇺🇸", "pn": "united_states", "lang": "en", "amz": ".com"}
-}
-
-@st.cache_data(ttl=3600)
-def auto_geo():
+# 3. LÓGICA DE PAÍS
+if 'config' not in st.session_state:
     try:
         r = requests.get('https://ipapi.co/json/', timeout=3).json()
-        return PAISES.get(r.get('country_code'), PAISES["DEFAULT"])
-    except: return PAISES["DEFAULT"]
+        suffix_map = {"ES": ".es", "MX": ".com.mx", "US": ".com", "AR": ".com.be"}
+        st.session_state.config = {"name": r.get('country_name'), "suffix": suffix_map.get(r.get('country_code'), ".com")}
+    except: st.session_state.config = {"name": "Global", "suffix": ".com"}
 
-if 'config' not in st.session_state:
-    st.session_state.config = auto_geo()
+# 4. CONTENIDO PRINCIPAL
+st.title("💸 TechFlash Monetized")
+st.write(f"Ofertas verificadas para **{st.session_state.config['name']}**")
 
-# 3. PANEL DE DONACIONES (CENTRALIZADO)
-st.markdown(f'''
-    <div class="pay-header">
-        <h1 style="color:white; margin:0; font-weight:900;">💳 Apoya a TechFlash780</h1>
-        <p style="color:#e6f0ff; margin:10px 0;">Ayúdanos a mantener los servidores de IA activos y libres de anuncios intrusivos.</p>
-        <div style="max-width:400px; margin: 0 auto;">
-            <div style="display:flex; justify-content:space-between; font-size:12px; color:white;">
-                <span>Meta mensual: $100 USD</span>
-                <span>65% completado</span>
+# Simulamos 3 rubros calientes
+categorias = ["Laptops", "Gaming", "Smart Home"]
+cols = st.columns(3)
+
+for i, cat in enumerate(categorias):
+    with cols[i]:
+        st.markdown(f'''
+            <div class="product-box">
+                <span style="color:#10b981; font-weight:bold;">HOT DEAL</span>
+                <h3>Tendencias {cat}</h3>
+                <p style="font-size:0.8rem; color:#9ca3af;">Actualizado hace 5 minutos</p>
             </div>
-            <div class="goal-bar"><div class="goal-fill"></div></div>
-        </div>
-    </div>
-''', unsafe_allow_html=True)
+        ''', unsafe_allow_html=True)
+        
+        # Link de Amazon con tu Comisión
+        url_amz = f"https://www.amazon{st.session_state.config['suffix']}/s?k={cat}&tag={AMZ_TAG}"
+        st.markdown(f'<a href="{url_amz}" target="_blank" class="btn-amazon">🛒 VER PRECIOS EN AMAZON</a>', unsafe_allow_html=True)
 
-c1, c2, c3 = st.columns([1,2,1])
-with c2:
-    paypal_url = f"https://www.paypal.me/{MI_PAYPAL_USER}"
-    st.link_button("🔥 DONAR POR PAYPAL (SEGURO)", paypal_url, use_container_width=True)
-    st.caption("✅ Verificado por PayPal. Transacción encriptada punto a punto.")
-
+# 5. PUBLICIDAD LATERAL O INFERIOR
 st.divider()
+col_inf1, col_inf2 = st.columns([2,1])
+with col_inf2:
+    st.markdown('<div class="ad-space" style="height:250px;">ANUNCIO LATERAL (Google Ads)</div>', unsafe_allow_html=True)
+with col_inf1:
+    st.subheader("💎 Apoya al Creador")
+    st.write("Si te ahorramos dinero con nuestras ofertas, considera una pequeña donación.")
+    st.link_button(f"Donar a TechFlash780", f"https://www.paypal.me/{MI_PAYPAL_USER}")
 
-# 4. MOTOR DE CONTENIDO (OFERTAS ACTUALES)
-@st.cache_data(ttl=900)
-def get_safe_content(conf):
-    try:
-        pytrends = TrendReq(hl=conf['lang'], tz=360)
-        trends = pytrends.trending_searches(pn=conf['pn'])[0].tolist()[:6]
-    except: trends = ["Hardware", "Gadgets", "Cybersecurity", "Amazon Deals"]
-    
-    data = []
-    translator = GoogleTranslator(source='auto', target=conf['lang'])
-    for t in trends:
-        kw = urllib.parse.quote(t)
-        rss = f"https://news.google.com/rss/search?q={kw}+deals&hl={conf['lang']}"
-        feed = feedparser.parse(rss)
-        if feed.entries:
-            try:
-                title = translator.translate(feed.entries[0].title.split(' - ')[0])
-                data.append({"title": title, "url": feed.entries[0].link, 
-                             "amz": f"https://www.amazon{conf['amz']}/s?k={kw}&tag=unlimited0f3-20", "trend": t})
-            except: continue
-    return data
-
-st.subheader(f"🌐 Radar de Tendencias: {st.session_state.config['name']}")
-items = get_safe_content(st.session_state.config)
-
-for i, item in enumerate(items):
-    st.markdown(f'''
-        <div class="secure-card">
-            <small style="color:#58a6ff;">🔍 DETECTADO EN {st.session_state.config['name'].upper()}</small>
-            <h3 style="margin-top:10px; color:white;">{item['title']}</h3>
-            <p style="font-size:12px; color:#8b949e;">Palabra clave: {item['trend']}</p>
-        </div>
-    ''', unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([2, 2, 1])
-    col1.link_button("📰 Leer Detalles", item['url'], use_container_width=True)
-    col2.link_button("🛒 Oferta Amazon", item['amz'], use_container_width=True)
-    
-    share_text = urllib.parse.quote(f"¡Mira esta oferta en TechFlash! {item['amz']}")
-    col3.link_button("📢", f"https://wa.me/?text={share_text}", use_container_width=True)
-    st.write("---")
-
-st.caption(f"Portal de Transacciones TechFlash v15.0 | Socio: {MI_PAYPAL_USER}")
+st.markdown('<div class="ad-space">FOOTER ADSENSE - 728x90</div>', unsafe_allow_html=True)

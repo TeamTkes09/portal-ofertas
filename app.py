@@ -33,6 +33,16 @@ with tab2:
 
 with tab3:
     st.subheader("Configuración de Seguridad")
-    st.session_state['key'] = st.text_input("Binance API Key", type="password")
-    st.session_state['secret'] = st.text_input("Binance Secret Key", type="password")
-    st.info("Las llaves se mantienen en la memoria de la sesión actual.")
+    # Usamos on_change para asegurar que se guarde el estado inmediatamente
+    st.text_input("Binance API Key", type="password", key='key_input')
+    st.text_input("Binance Secret Key", type="password", key='secret_input')
+    
+    if st.button("Guardar y Validar Llaves"):
+        st.session_state['key'] = st.session_state['key_input']
+        st.session_state['secret'] = st.session_state['secret_input']
+        st.success("Llaves vinculadas a la sesión.")
+        st.cache_data.clear() # Limpiamos caché para forzar nueva conexión
+    
+    st.divider()
+    st.subheader("🛠️ Diagnóstico de Conexión")
+    # ... (Tu código de diagnóstico aquí)

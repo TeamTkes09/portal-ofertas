@@ -76,14 +76,41 @@ def get_news_events():
 # --- 3. CRYPTO CON DATOS DE RED ---
 @st.cache_data(ttl=300)
 def get_crypto_opportunities():
-    # Precios base simulados para 2026
-    prices = {"BTC": 64200, "ETH": 3450, "SOL": 145, "USDT": 1.00, "MATIC": 0.85, "DOT": 7.20}
-    
     return [
-        {"coin": "BTC", "red": "Bitcoin (Legacy)", "fee_usd": 15.00, "vel": "30-60 min", "diff": 580, "ex": ["Binance", "Kraken"]},
-        {"coin": "ETH", "red": "Ethereum (ERC20)", "fee_usd": 8.50, "vel": "5-12 min", "diff": 45, "ex": ["Coinbase", "Binance"]},
-        {"coin": "SOL", "red": "Solana (SPL)", "fee_usd": 0.01, "vel": "< 1 min", "diff": 3.20, "ex": ["Kraken", "Binance"]},
-        {"coin": "USDT", "red": "TRON (TRC20)", "fee_usd": 1.00, "vel": "2-5 min", "diff": 0.02, "ex": ["Bybit", "Binance"]},
-        {"coin": "MATIC", "red": "Polygon", "fee_usd": 0.05, "vel": "2-3 min", "diff": 0.12, "ex": ["OKX", "Coinbase"]},
-        {"coin": "DOT", "red": "Polkadot", "fee_usd": 0.25, "vel": "5 min", "diff": 0.40, "ex": ["Binance", "Kraken"]}
+        {
+            "coin": "BTC", "red": "Bitcoin Network", "fee_usd": 15.00, "vel": "30 min",
+            "compra_en": "Binance", "precio_compra": 64100,
+            "vende_en": "Kraken", "precio_venta": 64680,
+            "tipo": "ALTO VALOR"
+        },
+        {
+            "coin": "ETH", "red": "Ethereum (ERC20)", "fee_usd": 8.50, "vel": "10 min",
+            "compra_en": "Coinbase", "precio_compra": 3410,
+            "vende_en": "Bybit", "precio_venta": 3475,
+            "tipo": "ESTÁNDAR"
+        },
+        {
+            "coin": "SOL", "red": "Solana (SPL)", "fee_usd": 0.01, "vel": "1 min",
+            "compra_en": "Kraken", "precio_compra": 142.50,
+            "vende_en": "Binance", "precio_venta": 146.80,
+            "tipo": "RECOMENDADO"
+        },
+        {
+            "coin": "USDT", "red": "TRON (TRC20)", "fee_usd": 1.00, "vel": "3 min",
+            "compra_en": "OKX", "precio_compra": 0.998,
+            "vende_en": "Bitget", "precio_venta": 1.002,
+            "tipo": "STABLE"
+        },
+        {
+            "coin": "MATIC", "red": "Polygon", "fee_usd": 0.05, "vel": "2 min",
+            "compra_en": "KuCoin", "precio_compra": 0.82,
+            "vende_en": "Coinbase", "precio_venta": 0.88,
+            "tipo": "BAJO COSTO"
+        },
+        {
+            "coin": "DOT", "red": "Polkadot", "fee_usd": 0.20, "vel": "5 min",
+            "compra_en": "Binance", "precio_compra": 7.10,
+            "vende_en": "Gate.io", "precio_venta": 7.45,
+            "tipo": "ALTCOIN"
+        }
     ]

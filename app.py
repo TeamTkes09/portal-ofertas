@@ -24,22 +24,25 @@ with tab1:
 
 with tab2:
     st.subheader("Buscador de Rutas de Ciclo Infinito")
+    
+    # Verificamos si las llaves existen antes de mostrar el botón
     if 'key' not in st.session_state or not st.session_state['key']:
         st.warning("⚠️ Configura tus llaves API en la pestaña de Configuración.")
     else:
+        # LÍNEA 30: El inicio del bloque
         if st.button("🔍 Iniciar Escaneo de Grafo"):
-    res = buscar_n_puntas(st.session_state['key'], st.session_state['secret'])
-    
-    if res['status'] == 'success':
-        st.success(f"🔥 ¡Oportunidad Detectada! ROI: {res['roi']}%")
-        st.info(f"Ruta de {res['nodos']} saltos: {' ➡️ '.join(res['ruta'])}")
-        
-        # Guardar en sesión para ejecutar si el usuario quiere
-        st.session_state['ruta_activa'] = res['ruta']
-    elif res['status'] == 'no_path':
-        st.warning(f"Mercado estable: {res['message']}")
-    else:
-        st.error(f"Error técnico: {res['message']}")
+            # LÍNEA 31: DEBE tener una sangría (4 espacios) respecto al 'if'
+            with st.spinner("Analizando 500 nodos de liquidez..."):
+                res = buscar_n_puntas(st.session_state['key'], st.session_state['secret'])
+                
+                if res['status'] == 'success':
+                    st.success(f"🔥 ¡Oportunidad Detectada! ROI: {res['roi']}%")
+                    st.info(f"Ruta: {' ➡️ '.join(res['ruta'])}")
+                    st.session_state['ruta_activa'] = res['ruta']
+                elif res['status'] == 'no_path':
+                    st.info("Mercado eficiente. No se hallaron brechas rentables.")
+                else:
+                    st.error(f"Error: {res['message']}")
 with tab3:
     st.subheader("Configuración de Seguridad")
     # Usamos on_change para asegurar que se guarde el estado inmediatamente

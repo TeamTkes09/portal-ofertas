@@ -2,7 +2,9 @@ import streamlit as st
 import urllib.parse
 import random
 
-def render_investment_section(suffix):
+def render_card(nombre, costo, reventa, riesgo, query):
+    ganancia = reventa - costo
+    roi = int((ganancia/costo)*100)
     st.subheader("💰 Oportunidades de Arbitraje y Reventa")
     
     # Lista de productos preconfigurados (puedes añadir más aquí)

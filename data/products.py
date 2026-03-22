@@ -34,4 +34,4 @@ def get_all_products():
         {"id": "H30", "n": "TeamGroup T-Force Delta 32GB", "c": 105, "v": 165, "r": "BAJO", "clr": "#22c55e", "q": "teamgroup t-force delta ddr5", "cat": "💾 HARDWARE"},
         {"id": "H31", "n": "Fractal Design North Case", "c": 130, "v": 210, "r": "BAJO", "clr": "#22c55e", "q": "fractal design north", "cat": "💾 HARDWARE"},
         {"id": "H32", "n": "Lote Fan Pack x10 ARGB", "c": 85, "v": 195, "r": "ALTO", "clr": "#ef4444", "q": "argb case fan bulk 120mm", "cat": "💾 HARDWARE"}
-    ] # <--- Asegúrate de que este corchete cierre la lista
+    ]

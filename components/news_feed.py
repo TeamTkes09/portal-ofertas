@@ -17,11 +17,12 @@ def render_news_section(suffix):
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: 800;
+            font-size: 8px;
         }
         </style>
     """, unsafe_allow_html=True)
     
-    # Datos con Consultas de Compra Estratégicas
+    # Datos de noticias
     news_data = [
         {
             "tag": "⚠️ URGENTE", 
@@ -42,7 +43,7 @@ def render_news_section(suffix):
         {
             "tag": "💎 OPORTUNIDAD", 
             "title": "PS5 Pro Refurbished", 
-            "desc": "Amazon Warehouse detecta 15 unidades. Margen de reventa: 35%.", 
+            "desc": "Amazon Warehouse detecta unidades. Margen de reventa alto.", 
             "time": "32m", "type": "success",
             "link_query": "PS5 Pro Console refurbished",
             "blink": False
@@ -50,7 +51,7 @@ def render_news_section(suffix):
         {
             "tag": "⚡ MERCADO", 
             "title": "Sony XM5 vs XM6", 
-            "desc": "Bajada de precio agresiva en XM5 por cambio de generación inminente.", 
+            "desc": "Bajada de precio agresiva en XM5 por cambio de generación.", 
             "time": "50m", "type": "warning",
             "link_query": "Sony WH-1000XM5",
             "blink": True
@@ -65,17 +66,27 @@ def render_news_section(suffix):
             
             # Colores dinámicos
             color_map = {"info": "#0ea5e9", "success": "#22c55e", "warning": "#f59e0b"}
-            tag_class = "urgent-blink" if item["blink"] else ""
-            tag_style = f"font-size: 8px; font-weight: 800; color: white; background: {color_map[item['type']]}; padding: 2px 5px; border-radius: 3px;" if not item["blink"] else ""
+            
+            # Lógica de estilo del Tag
+            if item["blink"]:
+                tag_html = f'<span class="urgent-blink">{item["tag"]}</span>'
+            else:
+                tag_html = f'<span style="font-size: 8px; font-weight: 800; color: white; background: {color_map[item["type"]]}; padding: 2px 5px; border-radius: 3px;">{item["tag"]}</span>'
 
-            st.markdown(f"""
+            # Construcción limpia del HTML
+            card_html = f"""
                 <div style="background: #1e293b; padding: 12px; border-bottom: 3px solid {color_map[item['type']]}; border-radius: 8px; margin-bottom: 10px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #334155;">
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span class="{tag_class}" style="{tag_style}">{item['tag']}</span>
+                            {tag_html}
                             <span style="font-size: 8px; color: #64748b; font-weight: bold;">{item['time']}</span>
                         </div>
                         <p style="margin: 0; font-size: 11px; font-weight: 700; color: #f8fafc; line-height: 1.2;">{item['title']}</p>
-                        <p style="margin: 6px 0 0 0; font-size: 10px; color: #94a3b8; line-height: 1.4; height: 40px; overflow: hidden;">{item['desc']}</p>
+                        <p style="margin: 6px 0 0 0; font-size: 10px; color: #94a3b8; line-height: 1.4;">{item['desc']}</p>
                     </div>
-                    <a href="{amz_url}" target="_blank" style="display: block; background: #fbbf24; color: #000; text-align: center; padding: 6px; border-radius: 4px; font-size:
+                    <a href="{amz_url}" target="_blank" style="display: block; background: #fbbf24; color: #000; text-align: center; padding: 6px; border-radius: 4px; font-size: 9px; font-weight: 900; text-decoration: none; margin-top: 10px; border-bottom: 2px solid #d97706;">
+                        🚀 APROVECHAR
+                    </a>
+                </div>
+            """
+            st.markdown(card_html, unsafe_allow_html=True)

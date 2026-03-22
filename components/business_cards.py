@@ -1,27 +1,20 @@
 import streamlit as st
 
 def render_investment_section(suffix, lista_productos):
-    """
-    Renderiza las tarjetas basadas en la lista filtrada/ordenada que recibe.
-    """
-    # 1. Título de la sección
     st.markdown("### 🎯 Oportunidades Seleccionadas (Alta Rentabilidad)")
     st.caption(f"Mostrando {len(lista_productos)} activos detectados en Amazon{suffix}")
 
-    # 2. Configuración de Rejilla (Grid)
-    # Usamos 4 columnas para escritorio, se adaptará en móvil automáticamente
+    # Contenedor de columnas
     cols = st.columns(4)
 
     for i, op in enumerate(lista_productos):
         with cols[i % 4]:
-            # Cálculos de negocio rápidos
             margen = op['v'] - op['c']
             roi = int((margen / op['c']) * 100)
-            
-            # Construcción de la URL de afiliado
             amz_url = f"https://www.amazon{suffix}/s?k={op['q']}&tag=tu-tag-20"
 
-            # HTML de la Tarjeta (Diseño Premium)
+            # El HTML debe empezar con un <div> y terminar con un </div> 
+            # El botón de compra DEBE estar dentro del mismo bloque para no romperse
             card_html = f"""
             <div style="
                 background-color: #1e293b; 
@@ -29,13 +22,13 @@ def render_investment_section(suffix, lista_productos):
                 border-radius: 12px; 
                 padding: 15px; 
                 margin-bottom: 20px; 
-                transition: transform 0.3s;
-                height: 380px;
+                height: 400px;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
+                font-family: sans-serif;
             ">
-                <div>
+                <div style="width: 100%;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <span style="background: {op['clr']}; color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px;">
                             {op['cat']}
@@ -72,10 +65,11 @@ def render_investment_section(suffix, lista_productos):
                     font-weight: 800; 
                     font-size: 12px;
                     display: block;
-                    margin-top: 15px;
+                    width: 100%;
                 ">
                     🛒 COMPRAR LOTE
                 </a>
             </div>
             """
+            # Esta es la línea clave que evita que el HTML se vea como texto
             st.markdown(card_html, unsafe_allow_html=True)

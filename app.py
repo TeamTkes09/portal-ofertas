@@ -24,3 +24,4 @@ with tab_news:
 
 # 5. Footer Legal
 footer.render_legal_bunker("TechFlash780")
+ target_col.markdown(html_card, unsafe_allow_html=True)

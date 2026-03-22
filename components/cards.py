@@ -3,42 +3,44 @@ import pandas as pd
 
 def render_crypto_section(lista_crypto):
     if not lista_crypto:
-        st.warning("Esperando respuesta de los exchanges...")
+        st.error("🚨 Error de conexión con los Exchanges. Reintentando...")
         return
 
-    st.markdown("### 🏦 Terminal de Arbitraje en Tiempo Real (Top 200)")
+    st.subheader("🏦 Monitor de Arbitraje en Tiempo Real (Top 200)")
     
-    # Convertimos a DataFrame para cálculos masivos
     df = pd.DataFrame(lista_crypto)
     
-    # Cálculo de rentabilidad real
-    df['Spread Bruto'] = df['Precio Venta'] - df['Precio Compra']
-    df['Ganancia Neta'] = df['Spread Bruto'] - df['Fee Red']
+    # Cálculos críticos de valor
+    df['Spread USD'] = df['Precio Venta'] - df['Precio Compra']
+    df['Ganancia Neta'] = df['Spread USD'] - df['Fee Red']
     df['ROI %'] = (df['Ganancia Neta'] / df['Precio Compra']) * 100
 
-    # Buscador y filtros
-    col_a, col_b = st.columns([2, 1])
-    search = col_a.text_input("🔍 Buscar moneda...").upper()
-    min_roi = col_b.slider("ROI Mínimo %", -1.0, 5.0, 0.1)
+    # Controles de usuario
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        search = st.text_input("🔍 Filtrar por Token (BTC, SOL, MATIC...)").upper()
+    with col2:
+        min_roi = st.number_input("ROI Mínimo %", value=0.0, step=0.1)
 
     if search:
         df = df[df['Token'].str.contains(search)]
     
-    df = df[df['ROI %'] >= min_roi]
+    # Filtro de oportunidad real
+    df_oportunidades = df[df['ROI %'] >= min_roi].sort_values(by="ROI %", ascending=False)
 
-    # Visualización Profesional
     st.dataframe(
-        df.sort_values(by="ROI %", ascending=False),
+        df_oportunidades,
         column_config={
             "Precio Compra": st.column_config.NumberColumn(format="$%.4f"),
             "Precio Venta": st.column_config.NumberColumn(format="$%.4f"),
             "Ganancia Neta": st.column_config.NumberColumn(format="$%.2f"),
             "ROI %": st.column_config.NumberColumn(format="%.3f%%"),
-            "Vol 24h": "Volumen 24h",
-            "Cambio 24h": st.column_config.TextColumn("Tendencia")
+            "Volumen 24h": st.column_config.NumberColumn(format="$%d"),
+            "Cambio %": st.column_config.NumberColumn(format="%.2f%%")
         },
         hide_index=True,
         use_container_width=True
     )
-    
-    st.caption("🔄 Los precios se sincronizan automáticamente cada 60 segundos con CoinGecko API.")
+
+def render_investment_section(pais, prods):
+    st.write("Sección de productos físicos (FBA)")

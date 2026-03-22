@@ -4,62 +4,50 @@ from styles.html_templates import get_card_template
 
 def render_investment_section(suffix, lista_productos):
     """
-    Renderiza la sección de oportunidades en una cuadrícula de 3 columnas.
-    Acepta el sufijo de Amazon (ej: .com, .es) y la lista filtrada de productos.
+    Renderiza las tarjetas de inversión en una cuadrícula de 3 columnas.
     """
-    
-    # Título de la sección
     st.markdown(f"### 🎯 Oportunidades Detectadas en Amazon{suffix}")
     
-    # Creamos una rejilla de 3 columnas
-    # Esto permite que si hay 32 productos, Streamlit cree automáticamente las filas necesarias
+    # Creamos la fila base de 3 columnas
     cols = st.columns(3)
 
     for i, op in enumerate(lista_productos):
-        # El operador % 3 asegura que los productos se repartan: 0, 1, 2, 0, 1, 2...
+        # El índice % 3 distribuye los productos en las 3 columnas de forma infinita
         with cols[i % 3]:
             
-            # --- 1. LÓGICA DE NEGOCIO ---
-            # Calculamos el margen y el ROI en tiempo real
+            # 1. Cálculos de Negocio
             costo = op.get('c', 0)
             venta = op.get('v', 0)
             margen_neto = venta - costo
-            
-            # Evitamos división por cero si el costo no está definido
             roi = int((margen_neto / costo) * 100) if costo > 0 else 0
             
-            # Generamos el enlace de búsqueda en Amazon
+            # 2. URL de Amazon con Tag de Afiliado
             amz_url = f"https://www.amazon{suffix}/s?k={op['q']}&tag=tu-tag-20"
 
-            # --- 2. CONSTRUCCIÓN DE LA TABLA DE COMPARATIVA ---
-            # Generamos el HTML para las filas de verificación (Google, eBay, etc.)
-            filas_comparativa_html = ""
+            # 3. Construcción del bloque de comparativa (HTML)
+            filas_html = ""
             for item in op.get('comparativa', []):
-                filas_comparativa_html += f"""
+                filas_html += f"""
                 <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #1e293b; font-size: 11px;">
                     <span style="color: #94a3b8;">{item['sitio']}</span>
-                    <a href="{item['url']}" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: bold;">
-                        ${item['precio']} ↗
-                    </a>
+                    <span style="color: #60a5fa; font-weight: bold;">${item['precio']} ↗</span>
                 </div>
                 """
 
-            # --- 3. RENDERIZADO FINAL ---
-            # Llamamos al template que está en styles/html_templates.py
-            try:
-                html_card = get_card_template(
-                    op=op, 
-                    roi=roi, 
-                    margen_neto=margen_neto, 
-                    amz_url=amz_url, 
-                    filas_html=filas_comparativa_html
-                )
-                
-                # Inyectamos el HTML en Streamlit con el blindaje activado
-                st.markdown(html_card, unsafe_allow_html=True)
-                
-            except Exception as e:
-                st.error(f"Error al renderizar la tarjeta {op.get('id')}: {e}")
+            # 4. Obtención del Template
+            # Pasamos los datos a la función que genera el string HTML
+            html_final = get_card_template(
+                op=op, 
+                roi=roi, 
+                margen_neto=margen_neto, 
+                amz_url=amz_url, 
+                filas_html=filas_html
+            )
+            
+            # 5. RENDERIZADO CRÍTICO (Sin esto, verás texto plano)
+            # Usamos un contenedor vacío para asegurar que el HTML se inyecte limpio
+            container = st.container()
+            container.markdown(html_final, unsafe_allow_html=True)
 
-    # Espaciado final para que el footer legal no quede pegado
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Espacio estético al final
+    st.write("")

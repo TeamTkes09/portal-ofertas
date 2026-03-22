@@ -1,73 +1,74 @@
 import streamlit as st
-from utils import geo_logic
-import data.products as products  # Importación centralizada
-from components import header, news_feed, business_cards, business_table, footer
+# Importamos nuestros módulos locales
+from data.products import get_all_products
+from components.business_cards import render_investment_section
 
-# 1. Configuración de página
+# 1. Configuración de la ventana del navegador
 st.set_page_config(
-    page_title="TechFlash Pro | Arbitraje 2026",
-    page_icon="⚡",
-    layout="wide"
+    page_title="Arbitrage Tracker Pro 2026",
+    page_icon="🚀",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# 2. Gestión de Datos y Memoria de Sesión (Session State)
-market = geo_logic.get_market_context()
-suffix = market['s']
+# 2. Estilos CSS personalizados para mejorar la interfaz
+st.markdown("""
+    <style>
+    .main {
+        background-color: #0f172a;
+    }
+    stCaption {
+        color: #94a3b8 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-# Cargamos y ordenamos los datos una sola vez por sesión
+# 3. Inicialización de Datos (Session State)
+# Esto evita que la app recargue los datos cada vez que haces un clic
 if 'oportunidades' not in st.session_state:
-    raw_data = products.get_all_products()
-    # Ordenamos por ROI de mayor a menor: (Venta - Costo) / Costo
+    raw_data = get_all_products()
+    # Ordenamos por ROI por defecto: (Venta - Costo) / Costo
     st.session_state.oportunidades = sorted(
         raw_data, 
-        key=lambda x: ((x['v'] - x['c']) / x['c']), 
+        key=lambda x: (x['v'] - x['c']) / x['c'], 
         reverse=True
     )
 
-# Control de cuántos productos mostrar (Lazy Load)
-if 'items_to_show' not in st.session_state:
-    st.session_state.items_to_show = 12  # Cantidad inicial
-
-# 3. Renderizar Cabecera
-header.render_hero(market['n'])
-
-# 4. Sistema de Navegación por Pestañas
-tab_biz, tab_news = st.tabs(["💰 OPORTUNIDADES DE NEGOCIO", "🌐 ACTUALIDAD TECNOLÓGICA"])
-
-with tab_biz:
-    # --- SELECTOR DE VISTA ---
-    col_v, col_spacer = st.columns([1, 2])
-    with col_v:
-        vista = st.radio(
-            "Visualización:", 
-            ["🎴 Tarjetas", "📑 Tabla Excel"], 
-            horizontal=True,
-            label_visibility="collapsed"
-        )
+# 4. Barra Lateral (Sidebar) - Filtros y Configuración
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/1998/1998614.png", width=80)
+    st.title("Panel de Control")
     st.divider()
+    
+    search_query = st.text_input("🔍 Buscar activo (ej: SSD, DDR5)", "").lower()
+    
+    filtro_riesgo = st.multiselect(
+        "Nivel de Riesgo",
+        options=["BAJO", "MEDIO", "ALTO"],
+        default=["BAJO", "MEDIO", "ALTO"]
+    )
+    
+    st.divider()
+    st.info("📅 Última actualización: Marzo 2026")
 
-    if vista == "🎴 Tarjetas":
-        # Extraemos solo la porción de productos según el Lazy Load
-        productos_visibles = st.session_state.oportunidades[:st.session_state.items_to_show]
-        
-        # Renderizamos las tarjetas pasándole la lista filtrada
-        business_cards.render_investment_section(suffix, productos_visibles)
-        
-        # BOTÓN LAZY LOAD: Solo aparece si hay más productos que mostrar
-        if st.session_state.items_to_show < len(st.session_state.oportunidades):
-            st.markdown("<br>", unsafe_allow_html=True)
-            col_btn_1, col_btn_2, col_btn_3 = st.columns([1, 2, 1])
-            with col_btn_2:
-                if st.button("➕ MOSTRAR MÁS OPORTUNIDADES", use_container_width=True):
-                    st.session_state.items_to_show += 12
-                    st.rerun() # Refresca para mostrar los nuevos items
-    else:
-        # En la Vista Pro (Tabla), mostramos el 100% para facilitar el análisis profundo
-        business_table.render_data_table(st.session_state.oportunidades, suffix)
+# 5. Cuerpo Principal de la App
+st.title("🚀 Arbitraje de Hardware 2026")
+st.subheader("Oportunidades de alta rentabilidad detectadas")
 
-with tab_news:
-    # Las noticias se mantienen fijas o con su propia lógica
-    news_feed.render_news_section(suffix=suffix)
+# 6. Lógica de Filtrado
+productos_filtrados = [
+    p for p in st.session_state.oportunidades 
+    if (search_query in p['n'].lower() or search_query in p['cat'].lower())
+    and p['r'] in filtro_riesgo
+]
 
-# 5. Footer Profesional
-footer.render_legal_bunker("TechFlash780")
+# 7. Renderizado de Componentes
+if productos_filtrados:
+    # Llamamos a la función de tarjetas que creamos en components/business_cards.py
+    render_investment_section(".com", productos_filtrados)
+else:
+    st.warning("⚠️ No se encontraron activos que coincidan con tu búsqueda.")
+
+# 8. Pie de página legal
+st.divider()
+st.caption("© 2026 Arbitrage Tracker Pro. Los precios mostrados son estimaciones de mercado y pueden variar según la disponibilidad.")

@@ -4,18 +4,17 @@ def render_investment_section(suffix, lista_productos):
     st.markdown("### 🎯 Oportunidades Seleccionadas (Alta Rentabilidad)")
     st.caption(f"Mostrando {len(lista_productos)} activos detectados en Amazon{suffix}")
 
-    # Creamos las columnas para la rejilla
+    # Creamos las 4 columnas
     cols = st.columns(4)
 
     for i, op in enumerate(lista_productos):
-        # Seleccionamos la columna correspondiente (0, 1, 2 o 3)
         with cols[i % 4]:
-            # Cálculos de negocio
+            # Cálculos de ROI
             margen = op['v'] - op['c']
             roi = int((margen / op['c']) * 100)
             amz_url = f"https://www.amazon{suffix}/s?k={op['q']}&tag=tu-tag-20"
 
-            # TODO EL HTML EN UN SOLO BLOQUE
+            # Diseño de la tarjeta en un solo bloque HTML
             card_html = f"""
             <div style="
                 background-color: #1e293b; 
@@ -27,7 +26,7 @@ def render_investment_section(suffix, lista_productos):
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                font-family: sans-serif;
             ">
                 <div style="width: 100%;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -37,22 +36,20 @@ def render_investment_section(suffix, lista_productos):
                         <span style="color: #94a3b8; font-size: 10px; font-weight: bold;">ID: {op['id']}</span>
                     </div>
                     
-                    # Dentro de business_cards.py, busca esta parte:
-
-<h4 style="
-    color: white; 
-    margin: 15px 0 10px 0; 
-    font-size: 14px; 
-    line-height: 1.3; 
-    font-weight: 600;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    height: 36px;
-">
-    {op['n']}
-</h4>
+                    <h4 style="
+                        color: white; 
+                        margin: 15px 0 10px 0; 
+                        font-size: 14px; 
+                        line-height: 1.3; 
+                        font-weight: 600;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        height: 36px;
+                    ">
+                        {op['n']}
+                    </h4>
                     
                     <div style="background: #0f172a; border-radius: 8px; padding: 12px; margin: 10px 0; border: 1px solid #1e293b;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
@@ -86,12 +83,9 @@ def render_investment_section(suffix, lista_productos):
                     font-size: 13px;
                     display: block;
                     width: 100%;
-                    transition: opacity 0.2s;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
                 ">
                     🛒 COMPRAR LOTE
                 </a>
             </div>
             """
-            # LA PARTE MÁS IMPORTANTE:
             st.markdown(card_html, unsafe_allow_html=True)
